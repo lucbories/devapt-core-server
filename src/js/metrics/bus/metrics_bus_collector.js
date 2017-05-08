@@ -54,7 +54,7 @@ export default class MetricsBusCollector extends MetricsCollector
 		
 		// SCHEDULE HOST METRICS
 		const self = this
-		const delay_in_sec = 3
+		const delay_in_sec = 30// TODO SET IN SETTINGS
 		
 		this.metrics_msg_bus.before()
 		this.metrics_metrics_bus.before()

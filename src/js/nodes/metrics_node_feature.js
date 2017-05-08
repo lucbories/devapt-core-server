@@ -61,15 +61,21 @@ export default class MetricsNodeFeature extends NodeFeature
 			'protocole':'bus',
 			'host':metrics_bus_host ? metrics_bus_host : 'localhost',
 			'port':metrics_bus_port ? metrics_bus_port : 9900,
-			'type':'metrics'
+			'type':'metrics',
+			'runtime':this.node.get_runtime(),
+			'logger_manager':this.node.get_logger_manager()
 		}
+		
+		console.log(metrics_server_settings.runtime.is_base_runtime ? 'RUNTIME FOUND FOR SERVER ' + 'metrics_server' : '!!! RUNTIME NOT FOUND FOR SERVER ' + 'metrics_server')
+		console.log(metrics_server_settings.logger_manager.is_logger_manager ? 'LOGGER MANAGER FOUND FOR SERVER ' + 'metrics_server' : '!!! LOGGER MANAGER NOT FOUND FOR SERVER ' + 'metrics_server')
 		
 		this.metrics_server = new MetricsServer('metrics_server', fromJS(metrics_server_settings) )
 		this.metrics_server.node = this.node
 		this.metrics_server.load()
 
-		this.node.metrics_bus_feature.bus.add_locale_target('metrics_server')
-		this.node.enable_locale_target('metrics_server')
+		this.node.metrics_bus_feature.bus.get_bus_engine().channel_add('metrics')
+		this.node.metrics_bus_feature.bus.msg_register(this.metrics_server, 'metrics')
+		// this.node.enable_locale_target('metrics_server')
 		this.metrics_server.enable_metrics()
 		
 		this.node.leave_group(':MetricsNodeFeature.load()')

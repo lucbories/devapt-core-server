@@ -1,9 +1,11 @@
 // NPM IMPORTS
-import assert from 'assert'
+// import assert from 'assert'
+import { fromJS } from 'immutable'
 
 // COMMON IMPORTS
-import T                 from 'devapt-core-common/dist/js/utils/types'
-import Bus               from 'devapt-core-common/dist/js/messaging/bus'
+// import T                 from 'devapt-core-common/dist/js/utils/types'
+import StreamBusEngine   from 'devapt-core-common/dist/js/messaging/stream_bus_engine'
+import MessageBus        from 'devapt-core-common/dist/js/messaging/message_bus'
 
 // SERVER IMPORTS
 import NodeFeature from './node_feature'
@@ -52,7 +54,85 @@ export default class BusNodeFeature extends NodeFeature
 		return this.node.get_name() + '_' + this.get_name()
 	}
 
+
+
+	/**
+	 * Create bus from settings.
+	 * 
+	 * @returns {MessageBus} - created bus messages.
+	 */
+	create_message_bus()
+	{
+		const default_bus_package = 'default'
+		const default_bus_type = this.node.is_master ? 'Server' : 'Client'
+
+		const bus_name = this.get_name()
+		const bus_pkg  = this.node.get_setting(['master', bus_name, 'package'], default_bus_package)
+		
+		let engine_settings = this.node.get_setting(['master', bus_name, 'settings'], fromJS({}) )
+		engine_settings = engine_settings.set('runtime', this.node._runtime)
+		engine_settings = engine_settings.set('type', this.node.get_setting(['master', bus_name, 'type'], default_bus_type) )
+		engine_settings = engine_settings.set('host', this.node.get_setting(['master', bus_name, 'host'], undefined) )
+		engine_settings = engine_settings.set('port', this.node.get_setting(['master', bus_name, 'port'], undefined) )
+
+		const bus_engine = bus_pkg == 'default' ? new StreamBusEngine(bus_name + '_engine', engine_settings, context, this.node.get_logger_manager()) : this.create_bus_engine(bus_pkg, bus_name + '_engine', engine_settings)
+		
+		// CREATE MESSAGES BUS FOR INTRA NODES COMMUNICATION
+		const bus_settings = { runtime:this.node._runtime, logger_manager:this.node.get_logger_manager() }
+		
+		return new MessageBus(this.get_bus_unique_name(), bus_engine, bus_settings, context)
+	}
+
+
+
+	/**
+	 * Create a bus engine.
+	 * 
+	 * @param {string} arg_package  - class package name.
+	 * @param {string} arg_name - bus engine name.
+	 * @param {object} arg_settings - bus engine settings.
+	 * 
+	 * @returns {BusEngine} - Bus engine instance
+	 */
+	create_bus_engine(arg_package, arg_name, arg_settings)
+	{
+		try
+		{
+			// GET PACKAGE
+			let pkg = require(arg_package)
+			if (! pkg)
+			{
+				return undefined
+			}
+			if (pkg.default)
+			{
+				pkg = pkg.default
+			}
+
+			// CHECK TYPE
+			if (! ('BusEngine' in pkg) )
+			{
+				return undefined
+			}
+
+			// GET CLASS
+			const pkg_class = pkg['BusEngine']
+			if (! pkg_class)
+			{
+				return undefined
+			}
+
+			return new pkg_class(arg_name, arg_settings, context, this.node.get_logger_manager())
+		}
+		catch(e)
+		{
+			console.warn('bad package name for bus engine:' + arg_package + ' with error:' + e.toString())
+		}
+
+		return undefined
+	}
 	
+
 	
 	/**
 	 * Load Node settings.
@@ -61,7 +141,7 @@ export default class BusNodeFeature extends NodeFeature
 	 */
 	load()
 	{
-		const self = this
+		// const self = this
 		this.node.enter_group(':BusNodeFeature.load()')
 		
 		if (this.bus)
@@ -72,31 +152,24 @@ export default class BusNodeFeature extends NodeFeature
 
 		super.load()
 		
-		const default_bus_package = 'devapt-features-queuelibbus'
-		const default_bus_type = this.node.is_master ? 'Server' : 'Client'
-
-		const bus_name = this.get_name()
-		const bus_pkg  = this.node.get_setting(['master', bus_name, 'package'], default_bus_package)
-		const bus_type = this.node.get_setting(['master', bus_name, 'type'], default_bus_type)
-		const bus_host = this.node.get_setting(['master', bus_name, 'host'], undefined)
-		const bus_port = this.node.get_setting(['master', bus_name, 'port'], undefined)
-
-		// CREATE MESSAGES BUS FOR INTRA NODES COMMUNICATION
-		const bus_settings = {}
-		this.bus = new Bus(this.get_bus_unique_name(), bus_settings, context)
-		this.node.enable_on_bus(this.bus)
+		this.bus = this.create_message_bus()
+		console.log(context + ':load:name=%s this.bus', this.get_name(), this.bus.get_name())
+		this.node.enable_on_bus(this.bus, 'default', 'receive_msg')
 
 		// CREATE MESSAGES GATEWAY FOR INTER NODES COMMUNICATION
-		if ( T.isString(bus_pkg) && T.isString(bus_type) && bus_host && bus_port)
+		/*if ( T.isString(bus_pkg) && T.isString(bus_type) && bus_host && bus_port)
 		{
 			if (bus_type != 'local')
 			{
 				const gw_settings = this.node.get_setting_js(['master', bus_name])
+				gw_settings.runtime = this.node._runtime
+				gw_settings.logger_manager = this.node.get_logger_manager()
 				const gw_name = this.get_bus_unique_name() + '_gateway'
 				
 				// console.log(context + ':load:bus_type != local and gw_settings=%o', gw_settings)
 
 				this.bus_gateway = this.create_bus_gateway(bus_pkg, bus_type, gw_name, gw_settings, context)
+				assert( T.isObject(this.bus_gateway), context + ':bad bus gateway instance')
 				const gw_started_promise = this.bus_gateway.enable()
 
 				assert(gw_started_promise, context + ':load:bad gateway started promise')
@@ -118,7 +191,7 @@ export default class BusNodeFeature extends NodeFeature
 					}
 				)
 			}
-		}
+		}*/
 		
 		this.node.leave_group(':BusNodeFeature.load()')
 	}
@@ -165,12 +238,12 @@ export default class BusNodeFeature extends NodeFeature
 	 * 
 	 * @returns {BusGateway} - BusClient or BusServer instance
 	 */
-	create_bus_gateway(arg_gw_pkg, arg_gw_type, arg_gw_name, arg_gw_settings)
+/*	create_bus_gateway(arg_gw_pkg, arg_gw_type, arg_gw_name, arg_gw_settings)
 	{
 		try
 		{
 			// GET PACKAGE
-			let pkg = require(arg_gw_pkg)
+			let pkg = require('../../../../' + arg_gw_pkg)
 			if (! pkg)
 			{
 				return undefined
@@ -201,5 +274,5 @@ export default class BusNodeFeature extends NodeFeature
 		}
 
 		return undefined
-	}
+	}*/
 }

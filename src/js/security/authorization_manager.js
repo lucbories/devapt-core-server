@@ -21,13 +21,16 @@ export default class AuthorizationManager extends PluginsManager
 {
 	/**
 	 * Create an Authorization manager class.
+	 * 
+	 * @param {RuntimeBase} arg_runtime - runtime.
 	 * @param {string|undefined} arg_log_context - optional.
 	 * @param {LoggerManager} arg_logger_manager - logger manager object (optional).
+	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_log_context, arg_logger_manager)
+	constructor(arg_runtime, arg_log_context, arg_logger_manager)
 	{
-		super(arg_log_context ? arg_log_context : context, arg_logger_manager)
+		super(arg_runtime, arg_log_context ? arg_log_context : context, arg_logger_manager)
 		
 		this.is_authorization_manager = true
 		

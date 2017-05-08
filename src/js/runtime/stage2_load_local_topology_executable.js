@@ -1,5 +1,6 @@
 // NPM IMPORTS
 import assert from 'assert'
+import { fromJS } from 'immutable'
 
 // COMMON IMPORTS
 import T from 'devapt-core-common/dist/js/utils/types'
@@ -63,7 +64,8 @@ export default class RuntimeStage2Executable extends RuntimeExecutable
 		// GET WORLD TOPOLOGY DEPLOYMENT FROM REGISTRY
 		this.info('Get world topology deployment from registry')
 		const node_settings = this.runtime.get_registry().get_collection_item('nodes', this.runtime.node.get_name())
-		// console.log(context + ':node_settings', node_settings)
+		console.log(context + ':node_settings:' + this.runtime.node.get_name() + ':', node_settings)
+		
 		this.runtime.node.load_topology_settings(node_settings)
 
 
@@ -73,7 +75,11 @@ export default class RuntimeStage2Executable extends RuntimeExecutable
 		const svc_mgr = rt_factory.get_services_manager()
 		const deploy_name = this.runtime.node.get_name()
 		const defined_item = this.runtime.defined_world_topology.node(deploy_name)
-		const deploy_settings = this.runtime.get_registry().root.get('deployments', {}).toJS()
+		
+		let deploy_settings = this.runtime.get_registry().root.get('deployments', fromJS({}) )
+		deploy_settings = deploy_settings.set('runtime', this.runtime)
+		deploy_settings = deploy_settings.set('logger_manager', this.runtime.get_logger_manager() )
+		
 		const deploy_factory = {
 			create:(arg_type, arg_name, arg_settings)=>{
 				switch(arg_type) {

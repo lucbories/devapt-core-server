@@ -1,12 +1,14 @@
 
 // COMMON IMPORTS
 import RenderingPlugin from 'devapt-core-common/dist/js/plugins/rendering_plugin'
+import ServicesPlugin  from 'devapt-core-common/dist/js/plugins/services_plugin'
+
+// SERVICES IMPORTS
+import DefaultServicesPlugin from 'devapt-core-services/dist/js/default_plugins/services_default_plugin'
 
 // SERVER IMPORTS
 import runtime from './base/runtime'
-import ServicesPlugin from './plugins/services_plugin'
 import ServersPlugin from './plugins/servers_plugin'
-import DefaultServicesPlugin from './default_plugins/services_default_plugin'
 
 // BROWSER IMPORTS
 import Component        from '../browser/base/component'

@@ -4,9 +4,9 @@ import restify from 'restify'
 
 // COMMON IMPORTS
 import T from 'devapt-core-common/dist/js/utils/types'
+import ServiceConsumer from 'devapt-core-common/dist/js/services/service_consumer'
 
 // SERVER IMPORTS
-import ServiceConsumer from './service_consumer'
 
 
 let context = 'server/services/base/routes_svc_consumer'
@@ -92,11 +92,14 @@ export default class RoutesSvcConsumer extends ServiceConsumer
 	}
 	
 	
+	
 	/**
-	 * Consume a service on a remote host
+	 * Consume a service on a remote host.
+	 * 
 	 * @param {object} arg_provider - service provider
 	 * @param {array} arg_routes - Routes to request
-	 * @return {object} a promise of results
+	 * 
+	 * @return {Promise} - Promise of ServiceResponse instance.
 	 */
 	consume_remote(arg_provider, arg_routes)
 	{

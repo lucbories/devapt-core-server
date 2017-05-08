@@ -36,14 +36,16 @@ export default class NodeMessaging extends DistributedInstance
 	 * 
 	 * @param {string} arg_name - resource name.
 	 * @param {object} arg_settings - resource settings.
+	 * @param {string} arg_log_context - trace context string (optional, default=context).
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_name, arg_settings)
+	constructor(arg_name, arg_settings, arg_log_context=context)
 	{
-		assert( T.isObject(arg_settings), context + ':bad settings object')
+		assert( T.isObject(arg_settings), arg_log_context + ':bad settings object')
+		assert( T.isObject(arg_settings.runtime), arg_log_context + ':bad runtime instance')
 		
-		super('nodes', 'Node', arg_name, arg_settings, context)
+		super('nodes', arg_name, 'Node', arg_settings, arg_log_context)
 		
 		this.is_node_messaging = true
 		
@@ -70,15 +72,15 @@ export default class NodeMessaging extends DistributedInstance
 	 * 
 	 * @returns {nothing}
 	 */
-	enable_locale_target(arg_name)
-	{
-		this.msg_bus_feature.bus.add_locale_target(arg_name)
+	// enable_locale_target(arg_name)
+	// {
+	// 	this.msg_bus_feature.bus.add_locale_target(arg_name)
 
-		if (arg_name != this.get_name())
-		{
-			this.msg_bus_feature.bus.add_locale_target(arg_name + '@' + this.get_name())
-		}
-	}
+	// 	if (arg_name != this.get_name())
+	// 	{
+	// 		this.msg_bus_feature.bus.add_locale_target(arg_name + '@' + this.get_name())
+	// 	}
+	// }
 
 	
 	

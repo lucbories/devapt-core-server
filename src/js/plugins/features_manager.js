@@ -58,6 +58,8 @@ export default class FeaturesManager extends PluginsManager
 		{
 			assert( T.isObject(arg_state), context + ':bad state object')
 		}
+		arg_settings = arg_settings.set('runtime', this.get_runtime())
+		arg_settings = arg_settings.set('logger_manager', this.get_logger_manager())
 		
 		const found_plugin = this.registered_plugins.find_by_filter( (plugin) => plugin.has(arg_class_name) )
 		

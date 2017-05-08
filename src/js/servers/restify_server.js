@@ -2,8 +2,11 @@
 import assert from 'assert'
 import restify from 'restify'
 
+// COMMON IMPORTS
+import T from 'devapt-core-common/dist/js/utils/types'
+
 // SERVER IMPORTS
-import Server from './server'
+import RoutableServer from './routable_server'
 import MetricsMiddleware from '../metrics/http/metrics_http_collector'
 
 
@@ -16,16 +19,32 @@ let context = 'server/servers/restify_server'
  * @author Luc BORIES
  * @license Apache-2.0
  */
-export default class RestifyServer extends Server
+export default class RestifyServer extends RoutableServer
 {
-	constructor(arg_name, arg_settings, arg_context)
+	/**
+	 * Create Restify server instance.
+	 * @extends RoutableServer
+	 * 
+	 * @param {string} arg_name - server name
+	 * @param {object} arg_settings - plugin settings map
+	 * @param {string} arg_log_context - trace context string.
+	 * 
+	 * @returns {nothing}
+	 */
+	constructor(arg_name, arg_settings, arg_log_context=context)
 	{
-		super(arg_name, 'RestifyServer', arg_settings, arg_context ? arg_context : context)
+		super(arg_name, 'RestifyServer', arg_settings, arg_log_context)
 		
 		this.is_restify_server = true
 	}
 	
+
 	
+	/**
+	 * Build private server instance.
+	 * 
+	 * @returns {nothing}
+	 */
 	build_server()
 	{
 		this.enter_group('build_server')
@@ -64,8 +83,6 @@ export default class RestifyServer extends Server
 				arg_record.svc.activate_on_server(arg_record.app, this, arg_record.cfg)
 			}
 		)
-		
-        
         
 		
 		// TODO: LOAD MIDDLEWARES FROM SETTINGS
@@ -126,5 +143,66 @@ export default class RestifyServer extends Server
 		
 		
 		this.leave_group('build_server')
+	}
+	
+	
+	
+	/**
+	 * Get server middleware for static route.
+	 * 
+     * @param {object} arg_cfg_route - plain object route configuration.
+	 * 
+	 * @returns {middleware} - middleware function as f(req, res, next)
+	 */
+	get_middleware_for_static_route(arg_cfg_route)
+	{
+		// DEBUG
+		console.log(context + ':get_middleware_for_static_route:express static route', arg_cfg_route)
+
+		const cb_arg = {
+			directory: arg_cfg_route.directory
+		}
+
+		if ( T.isString(arg_cfg_route.default_file) )
+		{
+			cb_arg.default = arg_cfg_route.default_file
+		}
+
+		// DEBUG
+		// console.log(cb_arg, 'restify route cfg')
+		// console.log('restify static route', arg_cfg_route.directory)
+		
+		return restify.serveStatic(cb_arg)
+	}
+	
+	
+	
+	/**
+	 * Get server middleware for directory route.
+	 * 
+     * @param {object}   arg_cfg_route - plain object route configuration.
+	 * @param {function} arg_callback - route handler callback.
+	 * 
+	 * @returns {boolean} - success or failure.
+	 */
+	add_get_route(arg_cfg_route, arg_callback)
+	{
+		this.enter_group('add_get_route')
+
+		assert( T.isObject(arg_cfg_route), this.get_context() + '::bad route config object')
+		assert( T.isString(arg_cfg_route.full_route), this.get_context() + '::bad route config full_route string')
+		assert( T.isFunction(arg_callback), this.get_context() + '::bad string')
+
+		// CHECK EXPRESS SERVER
+		if ( ! this.server || ! T.isFunction(this.server.use) )
+		{
+			this.leave_group('add_get_route:bad server error')
+			return false
+		}
+		
+		this.server.get(arg_cfg_route.full_route, arg_callback)
+		
+		this.leave_group('add_get_route')
+		return true
 	}
 }

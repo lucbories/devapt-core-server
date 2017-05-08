@@ -7,12 +7,12 @@ import os from 'os'
 import T                   from 'devapt-core-common/dist/js/utils/types'
 import {SOURCE_LOCAL_FILE} from 'devapt-core-common/dist/js/datas/providers/json_provider'
 import Context             from 'devapt-core-common/dist/js/base/context'
-import Transaction         from 'devapt-core-common/dist/js/base/transaction'
 import RuntimeBase         from 'devapt-core-common/dist/js/base/runtime_base'
 import topology_registry   from 'devapt-core-common/dist/js/topology/registry/index'
 import {register_runtime}  from 'devapt-core-common/dist/js/base/runtime'
 
 // SERVER IMPORTS
+import Transaction         from './transaction'
 import Security from './security'
 import * as exec from '../runtime/index'
 
@@ -72,7 +72,7 @@ class Runtime extends RuntimeBase
 		
 		this.plugins_factory = undefined
 		this.context = new Context(this)
-		this.security_mgr = new Security(context, { 'logger_manager':this.logger_manager } )
+		this.security_mgr = new Security(this, context, { 'logger_manager':this.get_logger_manager() } )
 		
 		this._state_store = topology_registry
 		this.topology_registry = topology_registry
@@ -129,7 +129,7 @@ class Runtime extends RuntimeBase
 	 */
 	get_deployed_topology()
 	{
-		return this.deployed_world_topology
+		return this.deployed_local_topology
 	}
 	
 	
@@ -146,6 +146,8 @@ class Runtime extends RuntimeBase
 		const self = this
 
 		// MERGE DEFAULT AND RUNTIME SETTINGS
+		default_settings.runtime = this
+		arg_settings.runtime = this
 		this.$settings = fromJS( Object.assign(default_settings, arg_settings) )
 		// console.log(context + ':load:runtime.$settings', this.$settings)
 
@@ -164,8 +166,8 @@ class Runtime extends RuntimeBase
 			}
 			const logger = new LoggerConsole(true, console_settings)
 			console_logger_uid = logger.uid
-			this.logger_manager.loggers.push(logger)
-			console_logger_index = this.logger_manager.loggers.length - 1
+			this._logger_manager.loggers.push(logger)
+			console_logger_index = this._logger_manager.loggers.length - 1
 			// console.log(context + ':load:add console logger index=' + console_logger_index)
 
 			this.enable_trace()
@@ -178,16 +180,16 @@ class Runtime extends RuntimeBase
 		this.is_master = this.get_setting('is_master', false)
 		// console.log(context + ':load:is_master', this.is_master)
 		
-		const stage0 = new exec.RuntimeStage0Executable(this.logger_manager)
-		const stage1 = new exec.RuntimeStage1Executable(this.logger_manager)
-		const stage2 = new exec.RuntimeStage2Executable(this.logger_manager)
-		const stage3 = new exec.RuntimeStage3Executable(this.logger_manager)
+		const stage0 = new exec.RuntimeStage0Executable(this._logger_manager)
+		const stage1 = new exec.RuntimeStage1Executable(this._logger_manager)
+		const stage2 = new exec.RuntimeStage2Executable(this._logger_manager)
+		const stage3 = new exec.RuntimeStage3Executable(this._logger_manager)
 		const execs = [stage0, stage1, stage2, stage3]
 
-		const tx = new Transaction('runtime', 'startup', 'loading', { logger_manager:this.logger_manager }, execs, Transaction.SEQUENCE)
+		const tx = new Transaction('runtime', 'startup', 'loading', { runtime:this, logger_manager:this._logger_manager }, execs, Transaction.SEQUENCE)
 		// console.log(context + ':load:before tx new')
 
-		tx.prepare({runtime:this})
+		tx.prepare({runtime:this, logger_manager:this._logger_manager})
 		// console.log(context + ':load:after tx prepare')
 
 		const tx_promise = tx.execute(null)
@@ -198,10 +200,10 @@ class Runtime extends RuntimeBase
 			// console.log(context + ':load:remove runtime loading console logger')
 			tx_promise.then(
 				() => {
-					if (self.logger_manager.loggers.length > console_logger_index && self.logger_manager.loggers[console_logger_index].get_uid() == console_logger_uid)
+					if (self.get_logger_manager().loggers.length > console_logger_index && self.get_logger_manager().loggers[console_logger_index].get_uid() == console_logger_uid)
 					{
 						console.log(context + ':load:remove console logger at ' + console_logger_index)
-						self.logger_manager.loggers.splice(console_logger_index, 1)
+						self.get_logger_manager().loggers.splice(console_logger_index, 1)
 					}
 				}
 			)
@@ -342,8 +344,10 @@ class Runtime extends RuntimeBase
 	
 	/**
 	 * Register and configure a socketio server.
-	 * @param {string} arg_server_name - bound server name
-	 * @param {object} arg_socketio - socketio server
+	 * 
+	 * @param {string} arg_server_name - bound server name.
+	 * @param {object} arg_socketio - socketio server.
+	 * 
 	 * @returns {nothing}
 	 */
 	add_socketio(arg_server_name, arg_socketio)
@@ -391,13 +395,13 @@ class Runtime extends RuntimeBase
 		arg_socket.emit('welcome on /', { from: 'server runtime' })
 		
 		// ON PING
-		arg_socket.on('ping',
-			function(data)
-			{
-				console.info(context + ':on_socketio_connect:socket receives ping', data)
-				arg_socket.emit('pong', { from: 'server runtime' })
-			}
-		)
+		// arg_socket.on('ping',
+		// 	function(data)
+		// 	{
+		// 		console.info(context + ':on_socketio_connect:socket receives ping', data)
+		// 		arg_socket.emit('pong', { from: 'server runtime' })
+		// 	}
+		// )
 	}
 	
 	

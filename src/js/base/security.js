@@ -26,20 +26,21 @@ export default class Security extends Errorable
 	 * Create a Security instance.
 	 * @extends Errorable
 	 * 
+	 * @param {RuntimeBase} arg_runtime - runtime.
 	 * @param {string} arg_log_context - trace logging context string.
 	 * @param {object} arg_settings - runtime settings.
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_log_context, arg_settings)
+	constructor(arg_runtime, arg_log_context, arg_settings)
 	{
 		const logger_manager = (arg_settings && arg_settings.logger_manager) ? arg_settings.logger_manager : undefined
 		super(arg_log_context ? arg_log_context : context, logger_manager)
 		
 		this.is_security = true
 		
-		this.authentication_manager = new AuthenticationManager(context + '.authentication', logger_manager)
-		this.authorization_manager = new AuthorizationManager(context + '.authorization', logger_manager)
+		this.authentication_manager = new AuthenticationManager(arg_runtime, context + '.authentication', logger_manager)
+		this.authorization_manager = new AuthorizationManager(arg_runtime, context + '.authorization', logger_manager)
 		
 		if (arg_settings)
 		{

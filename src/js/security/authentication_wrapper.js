@@ -25,12 +25,13 @@ export default class AuthenticationWrapper extends Settingsable
 	 * @extends Settingsable
 	 * 
 	 * @param {string|undefined} arg_log_context - optional.
+	 * @param {LoggerManager} arg_logger_manager - logger manager instance.
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_log_context)
+	constructor(arg_log_context=context, arg_logger_manager)
 	{
-		super(arg_log_context ? arg_log_context : context)
+		super(undefined, arg_log_context, arg_logger_manager)
 		
 		this.is_authentication_wrapper = true
 		this.authentication_is_enabled = true
@@ -139,6 +140,8 @@ export default class AuthenticationWrapper extends Settingsable
 		
 		// ADD LAST MIDDLEWARE
 		arg_server.server.use(last_mw)
+		
+		this.leave_group('apply_middlewares')
 		return true
 	}
 }

@@ -24,6 +24,8 @@ export default class PluginsManager extends Errorable
 	/**
 	 * Create a plugins manager instance.
 	 * @extends Errorable
+	 * 
+	 * @param {RuntimeBase} arg_runtime - runtime.
 	 * @param {string|undefined} arg_log_context - optional.
 	 * @param {LoggerManager} arg_logger_manager - logger manager object (optional).
 	 * @returns {nothing}
@@ -37,6 +39,12 @@ export default class PluginsManager extends Errorable
 		this._runtime = arg_runtime
 		this.registered_plugins = new Collection()
 		this.enabled_plugins = new Collection()
+	}
+
+
+	get_runtime()
+	{
+		return this._runtime
 	}
 	
 	

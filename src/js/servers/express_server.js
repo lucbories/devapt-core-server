@@ -1,5 +1,6 @@
 // NPM IMPORTS
 import assert from 'assert'
+import _ from 'lodash'
 import express from 'express'
 import http from 'http'
 import socketio from 'socket.io'
@@ -7,13 +8,16 @@ import compression from 'compression'
 // import helmet from 'helmet'
 import favicon from 'express-favicon'
 
+// COMMON IMPORTS
+import T from 'devapt-core-common/dist/js/utils/types'
+
 // SERVER IMPORTS
 import runtime from '../base/runtime'
-import Server from './server'
+import RoutableServer from './routable_server'
 import MetricsMiddleware from '../metrics/http/metrics_http_collector'
 
 
-let context = 'server/servers/express_server'
+const context = 'server/servers/express_server'
 
 
 
@@ -22,18 +26,32 @@ let context = 'server/servers/express_server'
  * @author Luc BORIES
  * @license Apache-2.0
  */
-export default class ExpressServer extends Server
+export default class ExpressServer extends RoutableServer
 {
-	constructor(arg_name, arg_settings, arg_context)
+	/**
+	 * Create Express server instance.
+	 * @extends RoutableServer
+	 * 
+	 * @param {string} arg_name - server name.
+	 * @param {object} arg_settings - plugin settings map.
+	 * @param {string} arg_log_context - trace context string.
+	 * 
+	 * @returns {nothing}
+	 */
+	constructor(arg_name, arg_settings, arg_log_context=context)
 	{
-		super(arg_name, 'ExpressServer', arg_settings, arg_context ? arg_context : context)
+		super(arg_name, 'ExpressServer', arg_settings, arg_log_context)
 		
 		this.is_express_server = true
-		
-		this.serverio = null
 	}
 	
+
 	
+	/**
+	 * Build private server instance.
+	 * 
+	 * @returns {nothing}
+	 */
 	build_server()
 	{
 		this.enter_group('build_server')
@@ -42,32 +60,39 @@ export default class ExpressServer extends Server
 		assert( this.server_protocole == 'http' || this.server_protocole == 'https', context + ':bad protocole for express [' + this.server_protocole + ']')
 		
 		// CREATE SERVER
+		this.info('build_server:create Express server')
 		this.server = express()
 		
 		// USE COMPRESSED RESPONSE WITH GZIP
+		this.info('build_server:use compression')
 		this.server.use(compression())
 		
 		// USE SECURITY MIDDLEWARE (https://www.npmjs.com/package/helmet)
+		this.info('build_server:use security')
 		// this.server.use(helmet)
 		this.server.disable('x-powered-by')
 		
 		
 		// USE METRICS MIDDLEWARE
+		this.info('build_server:use metrics')
 		this.server.use( MetricsMiddleware.create_middleware(this) )
 		
 		
 		// USE FAVICON MIDDLEWARE
-		const favicon_path = runtime.context.get_absolute_path('../public/assets/img/favico.png')
+		this.info('build_server:use favicon')
+		const favicon_path = runtime.context.get_absolute_path('../../../public/img/favico.png')
 		// console.log(favicon_path, 'favicon_path')
 		this.server.use( favicon(favicon_path) )
 		
 		
 		// BUILD SOCKETIO
+		this.info('build_server:use socketio')
 		const use_socketio = this.get_setting('use_socketio', false)
+		console.log(context + ':build_server:use socket io?', use_socketio)
 		
 		if (use_socketio)
 		{
-			// console.log(context + ':creating socket io')
+			console.log(context + ':build_server:creating Express socket io')
 			
 			this.server_http = http.Server(this.server)
 			this.serverio = socketio(this.server_http)
@@ -77,14 +102,17 @@ export default class ExpressServer extends Server
 
 		
 		// USE ALL MIDDLEWARES WITHOUT SECURITY
+		this.info('build_server:use all middleware without security')
 		this.services_without_security.forEach(
 			(arg_record) => {
+				this.info('build_server:activate service=' + arg_record.svc.get_name())
 				arg_record.svc.activate_on_server(arg_record.app, this, arg_record.cfg)
 			}
 		)
 
 
 		// USE AUTHENTICATION MIDDLEWARES
+		this.info('build_server:apply authentication middlewares')
 		this.authentication.apply_middlewares(this)
 		
 		
@@ -93,6 +121,7 @@ export default class ExpressServer extends Server
 		
 
 		// USE ALL MIDDLEWARES WITH SECURITY
+		this.info('build_server:use all middleware with security')
 		this.services_with_security.forEach(
 			(arg_record) => {
 				arg_record.svc.activate_on_server(arg_record.app, this, arg_record.cfg)
@@ -167,5 +196,118 @@ export default class ExpressServer extends Server
 			}
 		)
 		
+	}
+	
+	
+	
+	/**
+	 * Get server middleware for static route.
+	 * 
+     * @param {object} arg_cfg_route - plain object route configuration.
+	 * 
+	 * @returns {middleware} - middleware function as f(req, res, next)
+	 */
+	get_middleware_for_static_route(arg_cfg_route)
+	{
+		const dir_path = runtime.context.get_absolute_public_path(arg_cfg_route.directory)
+
+		// DEBUG
+		console.log(context + ':get_middleware_for_static_route:express static route', arg_cfg_route)
+		console.log(context + ':ROUTE FOR ASSETS IN DIRECTORY MODE => dir_path=', dir_path)
+
+		// STATIC OPTIONS
+		const one_day = 86400000
+		const static_cfg = {
+			maxAge:one_day,
+			redirect:false,
+			fallthrough:false,
+			setHeaders:undefined, // function
+			index:arg_cfg_route.default
+		}
+
+		return (req, res, next)=>{
+			const asset_path = req._parsedUrl.pathname
+
+			console.log(context + ':get_middleware_for_static_route:express static middleware', arg_cfg_route.directory, req._parsedUrl, dir_path, asset_path)
+			
+			debugger
+			
+			// TEST REQUIRED PREFIXES
+			if ( T.isNotEmptyArray(arg_cfg_route.required_prefixes) )
+			{
+				let match = false
+				_.forEach(arg_cfg_route.required_prefixes,
+					(value)=>{
+						if ( asset_path.startsWith(value) )
+						{
+							match = true
+						}
+					}
+				)
+
+				if (! match)
+				{
+					console.warn(context + ':get_middleware_for_static_route:not matching route prefix for ' + asset_path)
+
+					return next()
+				}
+			}
+			
+			// TEST REQUIRED SUFFIXES
+			if ( T.isNotEmptyArray(arg_cfg_route.required_suffixes) )
+			{
+				let match = false
+				_.forEach(arg_cfg_route.required_suffixes,
+					(value)=>{
+						if ( asset_path.endsWith(value) )
+						{
+							match = true
+						}
+					}
+				)
+
+				if (! match)
+				{
+					console.warn(context + ':get_middleware_for_static_route:not matching route suffix for ' + asset_path)
+
+					return next()
+				}
+			}
+
+			return express.static(dir_path, static_cfg)(req, res, next)
+		}
+	}
+	
+	
+	
+	/**
+	 * Get server middleware for directory route.
+	 * 
+     * @param {object}   arg_cfg_route - plain object route configuration.
+	 * @param {function} arg_callback - route handler callback.
+	 * 
+	 * @returns {boolean} - success or failure.
+	 */
+	add_get_route(arg_cfg_route, arg_callback)
+	{
+		this.enter_group('add_get_route')
+
+		const route = arg_cfg_route.route_regexp ? arg_cfg_route.route_regexp : arg_cfg_route.full_route
+
+		assert( T.isObject(arg_cfg_route),  this.get_context() + '::bad route config object')
+		assert( T.isFunction(arg_callback), this.get_context() + '::bad callback function for route [' + arg_cfg_route.full_route + ']')
+		assert( T.isString(route) || T.isRegExp(route), this.get_context() + '::bad route string|RegExp for config [' + JSON.stringify(arg_cfg_route) + ']')
+
+		// CHECK EXPRESS SERVER
+		if ( ! this.server || ! T.isFunction(this.server.use) )
+		{
+			this.leave_group('add_get_route:bad server error for route config [' + JSON.stringify(arg_cfg_route) + ']')
+			return false
+		}
+		
+		this.server.use(route, arg_callback)
+
+		this.leave_group('add_get_route:[' + arg_cfg_route.full_route + ']')
+		return true
 	}
 }

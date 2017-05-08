@@ -61,6 +61,7 @@ export default class RuntimeStage1Executable extends RuntimeExecutable
 		// GET WORLD TOPOLOGY SETTINGS
 		let promise = null
 		const runtime = this.runtime
+		const logger_manager = this.runtime.get_logger_manager()
 		if ( T.isObject(settings_provider) )
 		{
 			this.info('Settings provider found for master')
@@ -114,7 +115,20 @@ export default class RuntimeStage1Executable extends RuntimeExecutable
 				// CREATE PLUGINS MANAGERS
 				self.info('Creating plugins manager')
 				runtime.plugins_factory = new PluginsFactory(runtime)
-
+			}
+		)
+		.catch(
+			// FAILURE
+			function(arg_reason)
+			{
+				self.error(context + ':World creation and loading failure:Creating plugins manager:' + arg_reason)
+				console.error(context + ':World creation and loading failure:Creating plugins manager:' + arg_reason)
+				return false
+			}
+		)
+		.then(
+			function()
+			{
 				// GET REGISTRY SETTINGS
 				self.info('Get world definition settings from registry')
 				const world_settings = {
@@ -128,8 +142,21 @@ export default class RuntimeStage1Executable extends RuntimeExecutable
 
 				// CREATE WORLD TOPOLOGY DEFINITION ROOT
 				self.info('Creating world topology definition root')
-				runtime.defined_world_topology = new TopologyDefineWorld('world', world_settings, runtime)
-
+				runtime.defined_world_topology = new TopologyDefineWorld('world', world_settings, runtime, logger_manager)
+			}
+		)
+		.catch(
+			// FAILURE
+			function(arg_reason)
+			{
+				self.error(context + ':World creation and loading failure:Creating world topology definition root:' + arg_reason)
+				console.error(context + ':World creation and loading failure:Creating world topology definition root:' + arg_reason)
+				return false
+			}
+		)
+		.then(
+			function()
+			{
 				// LOAD WORLD TOPOLOGY DEFINITION
 				self.info('Loading world topology definition')
 				return runtime.defined_world_topology.load()
@@ -139,8 +166,8 @@ export default class RuntimeStage1Executable extends RuntimeExecutable
 			// FAILURE
 			function(arg_reason)
 			{
-				self.error(context + ':World creation and loading failure:' + arg_reason)
-				console.error(context + ':World creation and loading failure:' + arg_reason)
+				self.error(context + ':World creation and loading failure:Loading world topology definition:' + arg_reason)
+				console.error(context + ':World creation and loading failure:Loading world topology definition:' + arg_reason)
 				return false
 			}
 		)

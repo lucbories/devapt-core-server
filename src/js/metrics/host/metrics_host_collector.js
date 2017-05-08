@@ -50,7 +50,7 @@ export default class MetricsHostCollector extends MetricsCollector
 		
 		// SCHEDULE HOST METRICS
 		const self = this
-		const delay_in_sec = 3
+		const delay_in_sec = 30 // TODO SET IN SETTINGS
 		this.metrics_record.before()
 		
 		const handler = () => {

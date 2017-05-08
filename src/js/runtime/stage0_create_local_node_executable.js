@@ -58,7 +58,10 @@ export default class RuntimeStage0Executable extends RuntimeExecutable
 
 		// CREATE NODE
 		this.info('Create Node and load it')
-		this.runtime.node = new Node(node_name, this.runtime.get_settings())
+		const node_settings = this.runtime.get_settings()
+		node_settings.runtime = this.runtime
+		node_settings.logger_manager = this.get_logger_manager()
+		this.runtime.node = new Node(node_name, node_settings)
 		this.runtime.node.load()
 		
 		this.leave_group('execute')

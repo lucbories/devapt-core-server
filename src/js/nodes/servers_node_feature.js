@@ -66,6 +66,9 @@ export default class ServersNodeFeature extends NodeFeature
 				const server_type = server_cfg.has('type') ? server_cfg.get('type') : null
 				assert( T.isString(server_type), context + ':load:bad server type string for server name [' + server_name + ']')
 				
+				server_cfg = server_cfg.set('runtime', this.node.get_runtime() )
+				server_cfg = server_cfg.set('logger_manager', this.node.get_logger_manager() )
+
 				let server = self.create_server(server_type, server_name, server_cfg)
 				server.load()
 				server.node = self.node
@@ -157,6 +160,8 @@ export default class ServersNodeFeature extends NodeFeature
 		{
 			case ServerTypes.SERVER_TYPE_EXPRESS: {
 				// const ExpressServer = require('../servers/express_server')
+				console.log(arg_settings.get('runtime').is_base_runtime ? 'RUNTIME FOUND FOR SERVER ' + arg_name : '!!! RUNTIME NOT FOUND FOR SERVER ' + arg_name)
+				console.log(arg_settings.get('logger_manager').is_logger_manager ? 'LOGGER MANAGER FOUND FOR SERVER ' + arg_name : '!!! LOGGER MANAGER NOT FOUND FOR SERVER ' + arg_name)
 				return new ExpressServer(arg_name, arg_settings)
 			}
 			case ServerTypes.SERVER_TYPE_RESTIFY: {

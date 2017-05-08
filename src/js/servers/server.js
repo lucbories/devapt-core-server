@@ -37,18 +37,32 @@ export default class Server extends DistributedInstance
 {
 	/**
 	 * Create a server instance.
-	 * @extends BusClientInstance
+	 * @extends DistributedInstance
 	 * 
-	 * @param {string} arg_name - server name
-	 * @param {string} arg_class - server class name
-	 * @param {object} arg_settings - plugin settings map
+	 * 	API:
+	 * 		->constructor(arg_name, arg_class, arg_settings, arg_log_context=context)
+	 * 
+	 * 		->use_service_on_loading(arg_application, arg_service, arg_app_svc_cfg = {}):nothing - Add a service to use before or after security check.
+	 * 		
+	 * 		->get_server_security_settings():object - Get security settings object into the server.
+	 * 		->get_security_settings():Immutable.Map - Get security settings from server or runtime.
+	 * 
+	 * 		->load():nothing - Load server settings.
+	 * 
+	 * 		->enable():nothing - Enable server (start it).
+	 * 		->disable():nothing - Disable server (stop it).
+	 * 
+	 * 		->get_topology_info(arg_deep=true, arg_visited={}):object - Get topology item informations.
+	 * 
+	 * @param {string} arg_name - server name.
+	 * @param {string} arg_class - server class name.
+	 * @param {object} arg_settings - plugin settings map.
 	 * @param {string} arg_log_context - trace context string.
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_name, arg_class, arg_settings, arg_log_context)
+	constructor(arg_name, arg_class, arg_settings, arg_log_context=context)
 	{
-		const log_context = arg_log_context ? arg_log_context : context
 		
 		// DEBUG STORE
 		// console.log(store, 'store')
@@ -58,23 +72,24 @@ export default class Server extends DistributedInstance
 		{
 			console.error(arg_class, arg_name, arg_settings, arg_log_context, 'arg_class, arg_name, arg_settings, arg_context')
 		}
-		super('servers', (arg_class ? arg_class.toString() : 'Server'), arg_name, arg_settings, log_context)
+		super('servers', arg_name, (arg_class ? arg_class.toString() : 'Server'), arg_settings, arg_log_context)
 		
 		this.is_server = true
 		this.is_build = false
 		
-		this.server_host = null
-		this.server_port = null
-		this.server_protocole = null
-		this.server_type = null
+		this.server_host = undefined
+		this.server_port = undefined
+		this.server_protocole = undefined
+		this.server_type = undefined
 		
-		this.server = null
-		this.serverio = null
+		this.server = undefined
+		this.server_http = undefined
+		this.serverio = undefined
 		
 		this.services_without_security = [] // STORE PLAIN OBJECTS WITH THIS FORMAT: { app:application instance, svc:service instance, cfg:application service config }
 		this.services_with_security = [] // STORE PLAIN OBJECTS WITH THIS FORMAT: { app:application instance, svc:service instance, cfg:application service config }
 		
-		this.authentication = new AuthenticationWrapper(arg_log_context ? arg_log_context : context)
+		this.authentication = new AuthenticationWrapper(arg_log_context, this.get_logger_manager())
 		// this.authorization = new AuthorizationWrapper(arg_log_context ? arg_log_context : context)
 	}
 
@@ -94,6 +109,8 @@ export default class Server extends DistributedInstance
 		assert( T.isObject(arg_application) && arg_application.is_topology_define_application, context + ':bad application object')
 		assert( T.isObject(arg_service) && arg_service.is_service, context + ':bad service object')
 		assert( T.isObject(arg_app_svc_cfg) , context + ':bad application service config object')
+
+		this.info('use_service_on_loading:service=' + arg_service.get_name())
 
 		const security_enabled = arg_service.get_setting(['security', 'enabled'], true)
 		const authentication_enabled = arg_service.get_setting(['security', 'authentication', 'enabled'], true)
@@ -124,11 +141,11 @@ export default class Server extends DistributedInstance
 	 */
 	get_server_security_settings()
 	{
-		this.enter_group('get_security_settings')
+		this.enter_group('get_server_security_settings')
 		
 		const security_settings = this.get_setting('security', null)
 		
-		this.leave_group('get_security_settings')
+		this.leave_group('get_server_security_settings')
 		return security_settings
 	}
 	
@@ -170,20 +187,31 @@ export default class Server extends DistributedInstance
 			srv_security_settings = fromJS(srv_security_settings)
 		}
 		
-		if (srv_security_settings && srv_security_settings.has('authentication'))
+		if ( srv_security_settings && srv_security_settings.has('authentication') )
 		{
 			// AUTHENTICATION IS ENABLED ?
-			if ( srv_security_settings.hasIn(['authentication', 'enabled']) )
+			const auth_is_enabled = srv_security_settings.getIn(['authentication', 'enabled'], false)
+			if (! auth_is_enabled)
+			{
+				// self.error('get_security_settings:bad server.settings.security.authentication.enabled')
+				// self.leave_group('get_security_settings:from server with error')
+				self.leave_group('get_security_settings:from server with disabled authentication')
+				return security_settings
+			}
+			security_settings = security_settings.setIn(['authentication', 'enabled'], auth_is_enabled)
+			
+			/*if ( srv_security_settings.hasIn(['authentication', 'enabled']) )
 			{
 				const enabled = srv_security_settings.getIn(['authentication', 'enabled'])
 				security_settings = security_settings.setIn(['authentication', 'enabled'], enabled)
 			}
 			else
 			{
-				self.error('get_security_settings:bad server.settings.security.authentication.enabled')
-				self.leave_group('get_security_settings:from server with error')
+				// self.error('get_security_settings:bad server.settings.security.authentication.enabled')
+				// self.leave_group('get_security_settings:from server with error')
+				self.leave_group('get_security_settings:from server with disabled authentication')
 				return security_settings
-			}
+			}*/
 			
 			// AUTHENTICATION PLUGINS
 			if ( srv_security_settings.hasIn(['authentication', 'plugins']) )
@@ -219,16 +247,21 @@ export default class Server extends DistributedInstance
 		{
 			const enabled = rt_security_settings.get('enabled')
 			security_settings = security_settings.set('enabled', enabled)
-		}
-		else
-		{
-			self.error('get_security_settings:bad runtime.settings.security.enabled')
-			self.leave_group('get_security_settings:from runtime with error')
+		} else {
+			security_settings = security_settings.setIn(['authentication', 'enabled'], false)
+			self.warn('get_security_settings:security is disabled')
+			self.leave_group('get_security_settings:security is disabled')
 			return security_settings
 		}
+		// else
+		// {
+		// 	self.error('get_security_settings:bad runtime.settings.security.enabled')
+		// 	self.leave_group('get_security_settings:from runtime with error')
+		// 	return security_settings
+		// }
 		
 		// GET RUNTIME AUTHENTICATION SECURITY SETTINGS
-		if (rt_security_settings && rt_security_settings.has('authentication'))
+		if ( rt_security_settings && rt_security_settings.has('authentication') )
 		{
 			// AUTHENTICATION IS ENABLED ?
 			if ( rt_security_settings.hasIn(['authentication', 'enabled']) )
@@ -327,19 +360,16 @@ export default class Server extends DistributedInstance
 		// AUTHENTICATION
 		if ( security_settings && security_settings.hasIn(['authentication', 'enabled']) && security_settings.hasIn(['authentication', 'plugins']) )
 		{
-			this.authentication.load(security_settings.get('authentication'))
+			let auth_settings = security_settings.get('authentication')
+			auth_settings = auth_settings.set('runtime', this.get_runtime())
+			auth_settings = auth_settings.set('logger_manager', this.get_logger_manager())
+			this.authentication.load(auth_settings)
 		}
 		
 		// AUTHORIZATION
 		// TODO
 		
-		
-		// BUILD SERVER
-		// assert( T.isFunction(this.build_server), context + ':bad build_server function')
-		// this.build_server()
-		// this.is_build = true
-		
-		
+		// PARENT CLASS LOADING
 		super.load()
 		
 		// SUBSCRIBE TO MESSAGES BUS
@@ -347,7 +377,19 @@ export default class Server extends DistributedInstance
 
 		this.leave_group('load')
 	}
-	
+
+
+
+	/**
+	 * Build private server instance.
+	 * 
+	 * @returns {nothing}
+	 */
+	build_server()
+	{
+		// NOTHING TO DO HERE
+	}
+
 	
 	
 	/**
@@ -372,24 +414,25 @@ export default class Server extends DistributedInstance
 		
 		let should_listen = true
 		
-		// ENABLE ERROR HANDLING
-		if (this.finaly)
+		// ENABLE LAST LOADING/ACTIONS: ERROR HANDLING...
+		if ( T.isFunction(this.finaly) )
 		{
 			this.finaly()
 		}
 		
-		// LISTENER
+		// ENABLE LISTENER TRACE
 		if (should_listen)
 		{
 			const srv = this.server_http ? this.server_http : this.server
-			/*let listener =*/ srv.listen(this.server_port,
-				function()
-				{
-					// let host = listener.address().address;
-					// let port = listener.address().port;
-					console.info('%s listening at %s : %s', name, host, port)
-				}
-			)
+			if ( srv && T.isFunction(srv.listen) )
+			{
+				srv.listen(this.server_port,
+					function()
+					{
+						console.info('%s listening at %s : %s', name, host, port)
+					}
+				)
+			}
 		}
 	}
 	
@@ -402,7 +445,7 @@ export default class Server extends DistributedInstance
 	 */
 	disable()
 	{
-		
+		// NOTHING TO DO HERE
 	}
 
 

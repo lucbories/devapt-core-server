@@ -42,23 +42,25 @@ export default class Node extends NodeMessaging
 	 * 
 	 * @param {string} arg_name - resource name.
 	 * @param {object} arg_settings - resource settings.
+	 * @param {string} arg_log_context - trace context string (optional, default=context).
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_name, arg_settings)
+	constructor(arg_name, arg_settings, arg_log_context=context)
 	{
-		assert( T.isObject(arg_settings), context + ':bad settings object')
+		assert( T.isObject(arg_settings.runtime), arg_log_context + ':bad runtime instance')
+		assert( T.isObject(arg_settings), arg_log_context + ':bad settings object')
 		
-		super(arg_name, arg_settings, context)
+		super(arg_name, arg_settings, arg_log_context)
 		
 		this.is_node = true
 		
 		// CREATE NODE FEATURES
-		this.servers_feature = new ServersNodeFeature(this, 'servers')
-		this.msg_bus_feature = new BusNodeFeature(this, 'msg_bus')
-		this.logs_bus_feature = new BusNodeFeature(this, 'logs_bus')
+		this.servers_feature     = new ServersNodeFeature(this, 'servers')
+		this.msg_bus_feature     = new BusNodeFeature(this, 'msg_bus')
+		this.logs_bus_feature    = new BusNodeFeature(this, 'logs_bus')
 		this.metrics_bus_feature = new BusNodeFeature(this, 'metrics_bus')
-		this.metrics_feature = undefined
+		this.metrics_feature     = undefined
 
 		this.features = []
 		this.features.push(this.servers_feature)
@@ -79,13 +81,14 @@ export default class Node extends NodeMessaging
 	{
 		this.enter_group('load()')
 		
-		console.log(context + ':load:Node')
+		// console.log(context + ':load:Node')
 
-		super.load()
-
+		// LOAD BUSES FEATURES BEFORE LOADING DISTRIBUTED INSTANCE PARENT CLASS
 		this.msg_bus_feature.load()
 		this.logs_bus_feature.load()
 		this.metrics_bus_feature.load()
+
+		super.load()
 		
 		this.msg_bus = this.msg_bus_feature.bus
 		this.metrics_bus = this.metrics_bus_feature.bus

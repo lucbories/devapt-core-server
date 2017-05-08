@@ -41,14 +41,15 @@ export default class AuthenticationManager extends PluginsManager
 	 * AuthenticationWrapper use created plugins.
 	 * @extends PluginsManager
 	 * 
+	 * @param {RuntimeBase} arg_runtime - runtime.
 	 * @param {string|undefined} arg_log_context - optional.
 	 * @param {LoggerManager} arg_logger_manager - logger manager object (optional).
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_log_context, arg_logger_manager)
+	constructor(arg_runtime, arg_log_context, arg_logger_manager)
 	{
-		super(arg_log_context ? arg_log_context : context, arg_logger_manager)
+		super(arg_runtime, arg_log_context ? arg_log_context : context, arg_logger_manager)
 		
 		this.is_authentication_manager = true
 		
@@ -123,6 +124,8 @@ export default class AuthenticationManager extends PluginsManager
 		assert( T.isString(arg_settings.name) && arg_settings.name.length > 0, context + ':load_plugin:bad settings.name')
 		
 		// console.log(arg_settings.name, context + ':load_plugin:arg_settings.name')
+		arg_settings = arg_settings.set('runtime', this.get_runtime() )
+		arg_settings = arg_settings.set('logger_manager', this.get_logger_manager() )
 		
 		// LOAD PLUGIN
 		const mode = arg_settings.get('mode').toLocaleLowerCase()

@@ -33,9 +33,9 @@ export default class MetricsServer extends Server
 	 * 
 	 * @returns {nothing}
 	 */
-	constructor(arg_name, arg_settings, arg_context)
+	constructor(arg_name, arg_settings, arg_log_context=context)
 	{
-		super(arg_name, 'MetricsServer', arg_settings, arg_context ? arg_context : context)
+		super(arg_name, 'MetricsServer', arg_settings, arg_log_context)
 		
 		this.is_metric_server = true
         

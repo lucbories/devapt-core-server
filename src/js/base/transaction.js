@@ -6,8 +6,7 @@ import T         from 'devapt-core-common/dist/js/utils/types'
 import Instance  from 'devapt-core-common/dist/js/base/instance'
 
 // SERVER INSTANCE
-import MetricDuration from '../../server/metrics/metric_duration'
-// import MetricHost from '../../server/metrics/metric_host'
+import MetricDuration from '../metrics/metric_duration'
 
 
 const context = 'common/base/transaction'
@@ -57,7 +56,7 @@ export default class Transaction extends Instance
 		this.set_type(arg_type)
 		
 		this.metric_duration = new MetricDuration() 
-		this.metrics = [this.metric_duration/*, new MetricHost()*/]
+		this.metrics = [this.metric_duration]
 		// this.metrics = []
 		
 		this.status = STATUS_CREATED
