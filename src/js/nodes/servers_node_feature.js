@@ -6,10 +6,12 @@ import T          from 'devapt-core-common/dist/js/utils/types'
 import Collection from 'devapt-core-common/dist/js/base/collection'
 
 // SERVER IMPORTS
-import NodeFeature from './node_feature'
+import NodeFeature     from './node_feature'
 import { ServerTypes } from '../servers/server'
-import RestifyServer from '../servers/restify_server'
-import ExpressServer from '../servers/express_server'
+import RestifyServer   from '../servers/restify_server'
+import ExpressServer   from '../servers/express_server'
+import LogsServer      from '../servers/logs_server'
+import MetricsServer      from '../servers/metrics_server'
 
 
 
@@ -63,6 +65,8 @@ export default class ServersNodeFeature extends NodeFeature
 			(server_cfg, server_name) => {
 				self.node.info(':ServersNodeFeature.load:processing server creation of:' + server_name)
 				
+				// console.log(context + ':server=[%s] cfg=[%s]', server_name, JSON.stringify(server_cfg))
+
 				const server_type = server_cfg.has('type') ? server_cfg.get('type') : null
 				assert( T.isString(server_type), context + ':load:bad server type string for server name [' + server_name + ']')
 				
@@ -160,17 +164,21 @@ export default class ServersNodeFeature extends NodeFeature
 		{
 			case ServerTypes.SERVER_TYPE_EXPRESS: {
 				// const ExpressServer = require('../servers/express_server')
-				console.log(arg_settings.get('runtime').is_base_runtime ? 'RUNTIME FOUND FOR SERVER ' + arg_name : '!!! RUNTIME NOT FOUND FOR SERVER ' + arg_name)
-				console.log(arg_settings.get('logger_manager').is_logger_manager ? 'LOGGER MANAGER FOUND FOR SERVER ' + arg_name : '!!! LOGGER MANAGER NOT FOUND FOR SERVER ' + arg_name)
+				// console.log(arg_settings.get('runtime').is_base_runtime ? 'RUNTIME FOUND FOR SERVER ' + arg_name : '!!! RUNTIME NOT FOUND FOR SERVER ' + arg_name)
+				// console.log(arg_settings.get('logger_manager').is_logger_manager ? 'LOGGER MANAGER FOUND FOR SERVER ' + arg_name : '!!! LOGGER MANAGER NOT FOUND FOR SERVER ' + arg_name)
 				return new ExpressServer(arg_name, arg_settings)
 			}
 			case ServerTypes.SERVER_TYPE_RESTIFY: {
-				// const RestifyServer = require('../servers/restify_server')
 				return new RestifyServer(arg_name, arg_settings)
 			}
 			case ServerTypes.SERVER_TYPE_CLUSTER: {
-				// const ExpressServer = require('../servers/express_server')
 				return new ExpressServer(arg_name, arg_settings)
+			}
+			case ServerTypes.SERVER_TYPE_LOGS: {
+				return new LogsServer(arg_name, arg_settings)
+			}
+			case ServerTypes.SERVER_TYPE_METRICS: {
+				return new MetricsServer(arg_name, arg_settings)
 			}
 			default:{
 				assert(false, context + ':ServersNodeFeature.create_server:bad server type [' + arg_type + '] for name [' + arg_name + ']')

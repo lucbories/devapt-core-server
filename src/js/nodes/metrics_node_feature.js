@@ -73,7 +73,7 @@ export default class MetricsNodeFeature extends NodeFeature
 		this.metrics_server.node = this.node
 		this.metrics_server.load()
 
-		this.node.metrics_bus_feature.bus.get_bus_engine().channel_add('metrics')
+		// this.node.metrics_bus_feature.bus.get_bus_engine().channel_add('metrics')
 		this.node.metrics_bus_feature.bus.msg_register(this.metrics_server, 'metrics')
 		// this.node.enable_locale_target('metrics_server')
 		this.metrics_server.enable_metrics()

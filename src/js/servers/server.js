@@ -24,7 +24,9 @@ export const ServerTypes = {
 	SERVER_TYPE_RESTIFY : 'restify',
 	SERVER_TYPE_SOCKETIO : 'socketio',
 	SERVER_TYPE_FEATHER : 'feather',
-	SERVER_TYPE_CLUSTER : 'cluster'
+	SERVER_TYPE_CLUSTER : 'cluster',
+	SERVER_TYPE_LOGS : 'logs',
+	SERVER_TYPE_METRICS : 'metrics'
 }
 
 

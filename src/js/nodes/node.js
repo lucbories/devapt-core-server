@@ -94,6 +94,9 @@ export default class Node extends NodeMessaging
 		this.metrics_bus = this.metrics_bus_feature.bus
 		this.logs_bus = this.logs_bus_feature.bus
 
+		this.metrics_bus.get_bus_engine().channel_add('metrics')
+		this.logs_bus.get_bus_engine().channel_add('logs')
+
 		this.leave_group('load()')
 	}
 	

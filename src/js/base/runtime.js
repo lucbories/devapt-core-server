@@ -87,6 +87,18 @@ class Runtime extends RuntimeBase
 	
 	
 	/**
+	 * Get runtime node.
+	 * 
+	 * @returns {Node}
+	 */
+	get_node()
+	{
+		return this.node
+	}
+	
+	
+	
+	/**
 	 * Get runtime unique identifier.
 	 * 
 	 * @returns {string}
@@ -213,110 +225,7 @@ class Runtime extends RuntimeBase
 		this.separate_level_1()
 		return tx_promise
 	}
-	
 
-	
-	/**
-	 * Get a server by its name.
-	 * 
-	 * @param {string} arg_name - server name.
-	 * 
-	 * @returns {Server}
-	 */
-	// server(arg_name)
-	// {
-	// 	return this.defined_world_topology.servers.item(arg_name)
-	// }
-	
-
-	
-	/**
-	 * Get a service by its name.
-	 * 
-	 * @param {string} arg_name - service name.
-	 * 
-	 * @returns {Service}
-	 */
-	// service(arg_name)
-	// {
-	// 	return this.defined_world_topology.services.item(arg_name)
-	// }
-	
-	
-
-	/**
-	 * Get a registered service by its name.
-	 * 
-	 * @param {string} arg_name - registered service name.
-	 * 
-	 * @returns {Service}
-	 */
-	// registered_service(arg_name)
-	// {
-	// 	return this.topology_runtime.registered_services.item(arg_name)
-	// }
-	
-
-	
-	/**
-	 * Get a module by its name.
-	 * 
-	 * @param {string} arg_name - module name.
-	 * 
-	 * @returns {Module}
-	 */
-	// module(arg_name)
-	// {
-	// 	return this.topology_runtime.modules.item(arg_name)
-	// }
-	
-
-	
-	/**
-	 * Get a plugin by its name.
-	 * 
-	 * @param {string} arg_name - plugin name.
-	 * 
-	 * @returns {Plugin}
-	 */
-	// plugin(arg_name)
-	// {
-	// 	return this.topology_runtime.plugins.item(arg_name)
-	// }
-	
-	
-	
-	/**
-	 * Get a resource by its name.
-	 * @param {string} arg_name - resource name
-	 * @returns {Resource}
-	 */
-	// resource(arg_name)
-	// {
-	// 	return this.topology_runtime.resources.item(arg_name)
-	// }
-	
-	
-	/**
-	 * Get a transaction by its name.
-	 * @param {string} arg_name - transaction name
-	 * @returns {Transaction}
-	 */
-	// transaction(arg_name)
-	// {
-	// 	return this.topology_runtime.transactions.item(arg_name)
-	// }
-	
-	
-	/**
-	 * Get a application by its name.
-	 * @param {string} arg_name - application name
-	 * @returns {Application}
-	 */
-	// application(arg_name)
-	// {
-	// 	return this.get_topology().applications.item(arg_name)
-	// }
 	
 	
 	/**
