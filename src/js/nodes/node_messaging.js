@@ -24,7 +24,8 @@ const STATE_UNREGISTERING = 'NODE_IS_UNREGISTERING_TO_MASTER'
 
 
 /**
- * @file Node messaging base class.
+ * Node messaging base class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -32,7 +33,6 @@ export default class NodeMessaging extends DistributedInstance
 {
 	/**
 	 * Create a Node messaging instance.
-	 * @extends Instance
 	 * 
 	 * @param {string} arg_name - resource name.
 	 * @param {object} arg_settings - resource settings.
@@ -47,40 +47,27 @@ export default class NodeMessaging extends DistributedInstance
 		
 		super('nodes', arg_name, 'Node', arg_settings, arg_log_context)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_node_messaging = true
 		
 		// INIT MASTER ATTRIBUTES
+		
+		/**
+		 * Is master flag.
+		 * @type {boolean}
+		 */
 		this.is_master = this.get_setting('is_master', false)
+
+		
+		/**
+		 * Master name.
+		 * @type {string}
+		 */
 		this.master_name = this.is_master ? this.get_name() : this.get_setting(['master', 'name'], undefined)
 	}
-
-
-
-	// load()
-	// {
-	// 	console.log(context + ':load:NodeMessaging')
-
-	// 	super.load()
-	// }
-	
-
-
-	/**
-	 * Enable messaging for locale target.
-	 * 
-	 * @param {string} arg_name - locale target name.
-	 * 
-	 * @returns {nothing}
-	 */
-	// enable_locale_target(arg_name)
-	// {
-	// 	this.msg_bus_feature.bus.add_locale_target(arg_name)
-
-	// 	if (arg_name != this.get_name())
-	// 	{
-	// 		this.msg_bus_feature.bus.add_locale_target(arg_name + '@' + this.get_name())
-	// 	}
-	// }
 
 	
 	
@@ -144,7 +131,8 @@ export default class NodeMessaging extends DistributedInstance
 	 */
 	send_msg_to_master(arg_payload)
 	{
-		console.log('send a msg to master [%s]', this.master_name, arg_payload)
+		// console.log('send a msg to master [%s]', this.master_name, arg_payload)
+
 		this.send_msg(this.master_name, arg_payload)
 	}
 
@@ -157,11 +145,14 @@ export default class NodeMessaging extends DistributedInstance
 	 */
 	register_to_master()
 	{
-		console.log('register to master')
+		this.enter_group('register_to_master')
+		// console.log('register to master')
+
 		this.switch_state(STATE_REGISTERING)
 		
 		let node_cfg = this.get_settings().toJS()
 		delete node_cfg.logger_manager
+		delete node_cfg.runtime
 		
 		const msg_payload = {
 			'action':'NODE_ACTION_REGISTERING',
@@ -171,6 +162,8 @@ export default class NodeMessaging extends DistributedInstance
 		this.send_msg_to_master(msg_payload)
 		
 		this.switch_state(STATE_WAITING)
+
+		this.leave_group('register_to_master')
 	}
 	
 	

@@ -64,9 +64,10 @@ export default class RuntimeStage2Executable extends RuntimeExecutable
 		// GET WORLD TOPOLOGY DEPLOYMENT FROM REGISTRY
 		this.info('Get world topology deployment from registry')
 		const node_settings = this.runtime.get_registry().get_collection_item('nodes', this.runtime.node.get_name())
-		console.log(context + ':node_settings:' + this.runtime.node.get_name() + ':', node_settings)
+		// console.log(context + ':node_settings:' + this.runtime.node.get_name() + ':', node_settings)
 		
 		this.runtime.node.load_topology_settings(node_settings)
+		this.runtime.node.update_trace_enabled_stage_2()
 
 
 		// CREATE, LOAD AND APPLY WORLD TOPOLOGY DEPLOYMENT

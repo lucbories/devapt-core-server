@@ -65,11 +65,10 @@ export default class PluginsManager extends Errorable
 			// GIVEN PLUGIN IS A RELATIVE FILE PATH NAME
 			if ( T.isString(plugin) )
 			{
-				// const plugin_dir = plugin != default_plugin_path ? base_dir : __dirname
-
-				// const file_path_name = path.isAbsolute(plugin) ? plugin : path.join(plugin_dir, plugin)
 				const file_path_name = runtime.context.get_absolute_plugin_path(plugin)
-				console.info('loading plugin [' + plugin + '] at [' + (file_path_name == plugin ? 'same' : file_path_name) + ']')
+
+				// DEBUG
+				// console.info('loading plugin [' + plugin + '] at [' + (file_path_name == plugin ? 'same' : file_path_name) + ']')
 
 				try
 				{
@@ -91,8 +90,6 @@ export default class PluginsManager extends Errorable
 				const plugin_name = plugin.get_name()
 				if ( T.isString(plugin_name) )
 				{
-					// this.plugins[plugin_name] = plugin
-					// this.plugins_ordered.push(plugin)
 					this.register_plugin(plugin)
 					continue
 				}
@@ -161,8 +158,9 @@ export default class PluginsManager extends Errorable
 		const plugin_name = arg_plugin.get_name()
 		if (this.registered_plugins.find_by_name(plugin_name) )
 		{
-			this.error_already_registered(plugin_name)
-			return Promise.resolve(false)
+			// this.error_already_registered(plugin_name)
+			// return Promise.resolve(false)
+			return Promise.resolve(true)
 		}
 		
 		if (arg_position === 0)

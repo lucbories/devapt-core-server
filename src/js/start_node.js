@@ -62,7 +62,6 @@ if (!DEVAPT_NODE_NAME)
 const runtime_settings = require(DEVAPT_NODE_CFG)
 runtime_settings.base_dir = root_dir ? path.join(root_dir, commander.baseDirectory) : commander.baseDirectory
 runtime_settings.world_dir = topology_dir
-runtime_settings.is_master = true
 runtime_settings.servers_bindings = undefined
 if (commander.serversBindings)
 {

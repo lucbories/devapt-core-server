@@ -23,6 +23,7 @@ const STATUS_CLOSED = 'CLOSED'
 
 /**
  * Metrics collector base class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -30,9 +31,10 @@ export default class MetricsCollector extends Settingsable
 {
     /**
      * Metrics collector constructor.
-	 * @extends Settingsable
+	 * 
 	 * @param {Immutable.Map} arg_settings - instance settings map.
 	 * @param {string} arg_log_context - trace context string.
+	 * 
 	 * @returns {nothing}
      */
 	constructor(arg_settings, arg_log_context)

@@ -67,6 +67,10 @@ export default class RuntimeStage1Executable extends RuntimeExecutable
 			this.info('Settings provider found for master')
 			
 			const provider = JsonProviderFactory.create( settings_provider.set('runtime', runtime) )
+			if (! provider)
+			{
+				throw 'bad settings provider config.'
+			}
 			promise = provider.provide_json()
 			.then(
 				// SUCCESS
@@ -112,6 +116,14 @@ export default class RuntimeStage1Executable extends RuntimeExecutable
 		promise = promise.then(
 			function()
 			{
+				// LOAD TRACES SETTINGS
+				// self.info('Load traces settings')
+				// const traces_settings = runtime.get_registry().root.get('traces').toJS()
+				// logger_manager.load(traces_settings)
+				// runtime.update_trace_enabled()
+				// runtime.node.update_trace_enabled()
+				// runtime.node.update_trace_enabled_stage_1()
+
 				// CREATE PLUGINS MANAGERS
 				self.info('Creating plugins manager')
 				runtime.plugins_factory = new PluginsFactory(runtime)
@@ -143,6 +155,10 @@ export default class RuntimeStage1Executable extends RuntimeExecutable
 				// CREATE WORLD TOPOLOGY DEFINITION ROOT
 				self.info('Creating world topology definition root')
 				runtime.defined_world_topology = new TopologyDefineWorld('world', world_settings, runtime, logger_manager)
+				
+				runtime.update_trace_enabled()
+				runtime.node.update_trace_enabled()
+				runtime.node.update_trace_enabled_stage_1()
 			}
 		)
 		.catch(

@@ -230,7 +230,7 @@ export default class ExpressServer extends RoutableServer
 
 			console.log(context + ':get_middleware_for_static_route:express static middleware', arg_cfg_route.directory, req._parsedUrl, dir_path, asset_path)
 			
-			debugger
+			// debugger
 			
 			// TEST REQUIRED PREFIXES
 			if ( T.isNotEmptyArray(arg_cfg_route.required_prefixes) )

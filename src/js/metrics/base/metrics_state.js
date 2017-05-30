@@ -4,7 +4,8 @@
 
 
 /**
- * @file Metrics state base class.
+ * Metrics state base class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -13,7 +14,7 @@ export default class MetricsState
     /**
      * Metrics state constructor.
 	 * 
-	 * @params {string} arg_metrics_name - metrics series name ('http', 'host'...)
+	 * @param {string} arg_metrics_name - metrics series name ('http', 'host'...)
 	 * 
 	 * @returns {nothing}
      */

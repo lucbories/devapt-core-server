@@ -87,6 +87,18 @@ class Runtime extends RuntimeBase
 	
 	
 	/**
+	 * Get runtime context.
+	 * 
+	 * @returns {Context}
+	 */
+	get_context()
+	{
+		return this.context
+	}
+	
+	
+	
+	/**
 	 * Get runtime node.
 	 * 
 	 * @returns {Node}
@@ -190,7 +202,7 @@ class Runtime extends RuntimeBase
 		this.enter_group('load')
 		
 		this.is_master = this.get_setting('is_master', false)
-		// console.log(context + ':load:is_master', this.is_master)
+		// console.log(context + ':load:is_master', this.is_master, this.get_settings_js())
 		
 		const stage0 = new exec.RuntimeStage0Executable(this._logger_manager)
 		const stage1 = new exec.RuntimeStage1Executable(this._logger_manager)

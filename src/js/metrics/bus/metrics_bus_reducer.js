@@ -8,7 +8,8 @@ import MetricsBusState from './metrics_bus_state'
 
 
 /**
- * @file Reducer class for Bus metrics collect.
+ * Reducer class for Bus metrics collect.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -16,7 +17,6 @@ export default class MetricsBusReducer extends MetricsReducer
 {
 	/**
 	 * Reducer for Bus metric class.
-	 * @extends MetricsReducer
 	 * 
 	 * @returns {nothing}
 	*/

@@ -13,7 +13,8 @@ const context = 'server/metrics/bus/metrics_bus_state'
 
 
 /**
- * @file Bus metrics state class.
+ * Bus metrics state class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -21,7 +22,6 @@ export default class MetricBusState extends MetricsState
 {
     /**
      * Metrics bus state constructor.
-	 * @extends MetricsState
 	 * 
 	 * @returns {nothing}
      */

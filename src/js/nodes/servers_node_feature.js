@@ -39,8 +39,16 @@ export default class ServersNodeFeature extends NodeFeature
 	{
 		super(arg_node, arg_name)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_servers_node_feature = true
 		
+		/**
+		 * Servers instances collection.
+		 * @type {Collection}
+		 */
 		this.servers = new Collection()
 	}
 	
@@ -65,6 +73,7 @@ export default class ServersNodeFeature extends NodeFeature
 			(server_cfg, server_name) => {
 				self.node.info(':ServersNodeFeature.load:processing server creation of:' + server_name)
 				
+				// DEBUG
 				// console.log(context + ':server=[%s] cfg=[%s]', server_name, JSON.stringify(server_cfg))
 
 				const server_type = server_cfg.has('type') ? server_cfg.get('type') : null
@@ -75,6 +84,7 @@ export default class ServersNodeFeature extends NodeFeature
 
 				let server = self.create_server(server_type, server_name, server_cfg)
 				server.load()
+				server.update_trace_enabled()
 				server.node = self.node
 				
 				self.servers.add(server)
@@ -105,7 +115,6 @@ export default class ServersNodeFeature extends NodeFeature
 				const server_name = server.get_name()
 				
 				self.node.info(':ServersNodeFeature.start:starting server [' + server_name + ']')
-				// console.info(context + ':ServersNodeFeature.start:starting server [' + server_name + ']')
 				
 				server.enable()
 				server.enable_msg()
@@ -163,9 +172,6 @@ export default class ServersNodeFeature extends NodeFeature
 		switch(arg_type)
 		{
 			case ServerTypes.SERVER_TYPE_EXPRESS: {
-				// const ExpressServer = require('../servers/express_server')
-				// console.log(arg_settings.get('runtime').is_base_runtime ? 'RUNTIME FOUND FOR SERVER ' + arg_name : '!!! RUNTIME NOT FOUND FOR SERVER ' + arg_name)
-				// console.log(arg_settings.get('logger_manager').is_logger_manager ? 'LOGGER MANAGER FOUND FOR SERVER ' + arg_name : '!!! LOGGER MANAGER NOT FOUND FOR SERVER ' + arg_name)
 				return new ExpressServer(arg_name, arg_settings)
 			}
 			case ServerTypes.SERVER_TYPE_RESTIFY: {

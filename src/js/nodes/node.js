@@ -3,6 +3,7 @@ import assert from 'assert'
 
 // COMMON IMPORTS
 import T                  from 'devapt-core-common/dist/js/utils/types'
+import ServiceResponse    from 'devapt-core-common/dist/js/services/service_response'
 
 // SERVER IMPORTS
 import runtime            from '../base/runtime'
@@ -30,7 +31,8 @@ const STATE_STOPPED = 'NODE_IS_STOPPED'
 
 
 /**
- * @file Node class: node is an item of a topology and manages a set of servers.
+ * Node class: node is an item of a topology and manages a set of servers.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -38,7 +40,6 @@ export default class Node extends NodeMessaging
 {
 	/**
 	 * Create a Node instance.
-	 * @extends NodeMessaging
 	 * 
 	 * @param {string} arg_name - resource name.
 	 * @param {object} arg_settings - resource settings.
@@ -53,6 +54,10 @@ export default class Node extends NodeMessaging
 		
 		super(arg_name, arg_settings, arg_log_context)
 		
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_node = true
 		
 		// CREATE NODE FEATURES
@@ -94,10 +99,46 @@ export default class Node extends NodeMessaging
 		this.metrics_bus = this.metrics_bus_feature.bus
 		this.logs_bus = this.logs_bus_feature.bus
 
+		this.msg_bus.get_bus_engine().channel_add('default')
 		this.metrics_bus.get_bus_engine().channel_add('metrics')
 		this.logs_bus.get_bus_engine().channel_add('logs')
 
+		this.enable_on_bus(this.msg_bus, 'default', 'receive_msg')
+
+		// DEBUG
+		// if (! this.is_master)
+		// {
+		// 	this.msg_bus.get_bus_engine().channel_on('default',
+		// 		(payload)=>{
+		// 			console.log('MESSAGE HANDLER', payload)
+		// 		}
+		// 	)
+		// }
+
 		this.leave_group('load()')
+	}
+
+	
+	// TODO API
+	update_trace_enabled_stage_1()
+	{
+		this.msg_bus.update_trace_enabled()
+		this.msg_bus.get_bus_engine().update_trace_enabled()
+		
+		this.metrics_bus.update_trace_enabled()
+		this.metrics_bus.get_bus_engine().update_trace_enabled()
+		
+		this.logs_bus.update_trace_enabled()
+		this.logs_bus.get_bus_engine().update_trace_enabled()
+	}
+
+	// TODO API
+	update_trace_enabled_stage_2()
+	{
+		if (this.is_master && this.metrics_feature)
+		{
+			this.metrics_feature.get_metrics_server().update_trace_enabled()
+		}
 	}
 	
 	
@@ -222,6 +263,7 @@ export default class Node extends NodeMessaging
 		{
 			return undefined
 		}
+		
 		const srv = this.metrics_feature.get_metrics_server()
 		assert( T.isObject(srv), context + ':get_metrics_server:bad metrics_server object')
 		return srv
@@ -266,18 +308,34 @@ export default class Node extends NodeMessaging
 		this.info('receiving a message from ' + arg_msg.get_sender())
 		
         // CHECK PAYLOAD
-		assert( T.isObject(arg_msg.get_payload()), context + ':receive_msg:bad payload object')
+		const payload = arg_msg.get_payload()
+		assert( T.isObject(payload), context + ':receive_msg:bad payload object')
 
         // DEBUG
-		// console.log(arg_payload, 'arg_payload from ' + arg_sender)
+		// console.log(context + ':receive_msg:sender=[%s] payload=[%s]', arg_msg.get_sender(), JSON.stringify(payload) )
+
+		// PINGPONG FEATURE
+		if (payload.service == 'pingpong' && payload.operation == 'devapt-ping')
+		{
+			const response = new ServiceResponse(payload)
+			response.set_results(['devapt-pong', this.get_name()])
+			
+			// DEBUG
+			// console.log(context + ':receive_msg:reply pong:', response)
+
+			this.send_msg(arg_msg.get_sender(), response.get_properties_values())
+
+			this.leave_group('receive_msg')
+			return
+		}
 
 		if (this.is_master)
 		{
-			this.receive_master_msg(arg_msg.get_sender(), arg_msg.get_payload())
+			this.receive_master_msg(arg_msg.get_sender(), payload)
 		}
 		else
 		{
-			this.receive_node_msg(arg_msg.get_sender(), arg_msg.get_payload())
+			this.receive_node_msg(arg_msg.get_sender(), payload)
 		}
 
 		this.leave_group('receive_msg')
@@ -317,12 +375,16 @@ export default class Node extends NodeMessaging
 		// REGISTER A NEW NODE ON MASTER TOPOLOGY
 		if (arg_payload.action == 'NODE_ACTION_REGISTERING' && this.get_name() != arg_payload.node.name)
 		{
+			this.msg_bus.msg_add_recipient(arg_sender, 'remote')
+
 			const cfg = runtime.get_registry().initial_config
 			const response_msg = {
 				action:'NODE_ACTION_REGISTERING',
 				master:this.get_name(),
 				settings:cfg
 			}
+
+			// DEBUG
 			// console.log(context + ':receive_master_msg:send response', response_msg)
 
 			this.remote_nodes[arg_payload.node.name] = arg_payload.node
@@ -346,7 +408,8 @@ export default class Node extends NodeMessaging
 	{
 		this.enter_group('receive_node_msg')
         
-		console.log(context + ':receive_node_msg:send response from %s', arg_sender, arg_payload)
+		// DEBUG
+		// console.log(context + ':receive_node_msg:send response from %s', arg_sender, arg_payload)
 
 		if (arg_payload.action == 'NODE_ACTION_REGISTERING' && T.isObject(arg_payload.settings))
 		{
@@ -380,11 +443,9 @@ export default class Node extends NodeMessaging
 		this.features.forEach(
 			(feature) => {
 				self.info('Starting feature [' + feature.get_name() + ']')
-				// console.info(context + ':starting feature [' + feature.get_name() + ']')
 				
 				feature.start()
 
-				// console.info('Feature is started [' + feature.get_name() + ']')
 				self.info('Feature is started [' + feature.get_name() + ']')
 			}
 		)

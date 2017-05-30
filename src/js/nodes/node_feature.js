@@ -22,10 +22,28 @@ export default class NodeFeature
 	 */
 	constructor(arg_node, arg_name)
 	{
+		/**
+		 * Class type flag.
+		 * @type {boolean}
+		 */
 		this.is_node_feature = true
 		
+		/**
+		 * Node instance.
+		 * @type {Node}
+		 */
 		this.node = arg_node
+		
+		/**
+		 * Feature name.
+		 * @type {string}
+		 */
 		this.name = arg_name
+		
+		/**
+		 * Is ready flag.
+		 * @type {boolean}
+		 */
 		this.is_ready = false
 	}
 

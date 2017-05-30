@@ -56,11 +56,14 @@ export default class RuntimeStage0Executable extends RuntimeExecutable
 			// console.log(context + ':execute:Node is not master')
 		}
 
-		// CREATE NODE
-		this.info('Create Node and load it')
+		// PREPARE NODE SETTINGS
+		this.info('Prepare Node settings')
 		const node_settings = this.runtime.get_settings()
 		node_settings.runtime = this.runtime
 		node_settings.logger_manager = this.get_logger_manager()
+
+		// CREATE NODE	
+		this.info('Create Node and load it')
 		this.runtime.node = new Node(node_name, node_settings)
 		this.runtime.node.load()
 		

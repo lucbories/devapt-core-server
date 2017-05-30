@@ -8,7 +8,8 @@ import MetricsRecord from '../base/metrics_record'
 
 
 /**
- * @file Bus information metric class.
+ * Bus information metric class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -16,7 +17,6 @@ export default class MetricsBusRecord extends MetricsRecord
 {
     /**
      * Metrics bus record constructor.
-	 * @extends MetricsRecord
 	 * 
 	 * @returns {nothing}
      */

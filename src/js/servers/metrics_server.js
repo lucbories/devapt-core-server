@@ -5,6 +5,7 @@ import assert from 'assert'
 import T from 'devapt-core-common/dist/js/utils/types'
 
 // SERVER IMPORTS
+// import runtime from '../base/runtime'
 import Server from './server'
 import MetricsHostCollector from '../metrics/host/metrics_host_collector'
 import MetricsNodeJsCollector from '../metrics/nodejs/metrics_nodejs_collector'
@@ -17,15 +18,38 @@ const context = 'server/servers/metrics_server'
 
 
 /**
- * @file Metrics server class.
+ * Metrics server class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
+ * 
+ * @example
+ * 	API:
+ * 		->build_server()
+ * 
+ * 		->receive_metrics(arg_msg)
+ * 		->process_metric(arg_metric_type, arg_metrics)
+ * 
+ * 		->get_metrics_state_values(arg_type)
+ * 
+ * 		->get_http_metrics_state_values()
+ * 
+ * 		->get_host_metrics_state_values()
+ * 		->get_host_metrics_state_values_items()
+ * 		->get_host_metrics_state_values_for(arg_hostname)
+ * 
+ * 		->get_bus_metrics_state_values()
+ * 		->get_bus_metrics_state_values_items()
+ * 		->get_bus_metrics_state_values_for(arg_busname)
+ * 
+ * 		->get_nodejs_metrics_state_values()
+ * 		->get_nodejs_metrics_state_values_items()
+ * 		->get_nodejs_metrics_state_values_for(arg_runtime_uid)
  */
 export default class MetricsServer extends Server
 {
 	/**
 	 * Create MetricsServer instance to process metrics records.
-	 * @extends Server
 	 * 
 	 * @param {string} arg_name - server instance name
 	 * @param {Immutable.Map} arg_settings - server instance settings
@@ -65,6 +89,8 @@ export default class MetricsServer extends Server
 		
 		assert( this.server_protocole == 'bus', context + ':bad protocole for metric server [' + this.server_protocole + ']')
 		
+		// runtime.node.metrics_bus.msg_register(this, 'metrics', 'receive_metrics')
+
 		this.leave_group('build_server')
 	}
 
@@ -131,20 +157,50 @@ export default class MetricsServer extends Server
 	 * Get metrics state values.
 	 * 
 	 * @param {string} arg_type - metrics type.
+	 * @param {string} arg_key  - metrics key.
 	 * 
-	 * @returns {Object} - http state object.
+	 * @returns {object} - metrics collector state values object.
 	 */
-	get_metrics_state_values(arg_type)
+	get_metrics_state_values(arg_type, arg_key=undefined)
 	{
 		if (arg_type in this.metrics_collectors)
 		{
 			const metrics_collector = this.metrics_collectors[arg_type]
 			assert( T.isObject(metrics_collector) && metrics_collector.is_metrics_collector, context + ':get_metrics_state_values:bad metrics collector object for ' + arg_type)
 			
-			return metrics_collector.get_state_values()
+			if (! T.isNotEmptyString(arg_key) )
+			{
+				return metrics_collector.get_state_values()
+			}
+
+			const state_values = metrics_collector.get_state_values()
+			if (arg_key in state_values)
+			{
+				return state_values[arg_key]
+			}
 		}
 		
 		return undefined
+	}
+	
+	
+	
+	/**
+	 * Get metrics state values keys.
+	 * 
+	 * @param {string} arg_type - metrics type.
+	 * 
+	 * @returns {array} - state values keys.
+	 */
+	get_metrics_state_values_items(arg_type)
+	{
+		const state_values = this.get_metrics_state_values(arg_type)
+		let keys = Object.keys(state_values)
+		
+		const metric_index = keys.indexOf('metric')
+		keys.splice(metric_index, 1)
+		
+		return keys
 	}
 	
 	

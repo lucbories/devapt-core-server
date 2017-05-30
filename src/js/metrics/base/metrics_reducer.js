@@ -10,7 +10,8 @@ const context = 'server/metrics/base/metrics_reducer'
 
 
 /**
- * @file Reducer class for HTTP metrics collect.
+ * Reducer class for HTTP metrics collect.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -19,7 +20,7 @@ export default class MetricsReducer
 	/**
 	 * Reducer for metrics class.
 	 * 
-	 * @params {string} arg_metrics_name - metrics series name ('http', 'host'...)
+	 * @param {string} arg_metrics_name - metrics series name ('http', 'host'...)
 	 * 
 	 * @returns {nothing}
 	*/

@@ -12,6 +12,7 @@ const context = 'server/metrics/bus/metrics_bus_collector'
 
 /**
  * Metrics Bus collector class.
+ * 
  * @author Luc BORIES
  * @license Apache-2.0
  */
@@ -19,9 +20,10 @@ export default class MetricsBusCollector extends MetricsCollector
 {
     /**
      * Metrics collector constructor.
-	 * @extends MetricsCollector
+	 * 
 	 * @param {Immutable.Map} arg_settings - instance settings map.
 	 * @param {string} arg_log_context - trace context string.
+	 * 
 	 * @returns {nothing}
      */
 	constructor(arg_settings, arg_log_context)
@@ -54,7 +56,7 @@ export default class MetricsBusCollector extends MetricsCollector
 		
 		// SCHEDULE HOST METRICS
 		const self = this
-		const delay_in_sec = 30// TODO SET IN SETTINGS
+		const delay_in_sec = 300 // TODO SET IN SETTINGS
 		
 		this.metrics_msg_bus.before()
 		this.metrics_metrics_bus.before()
