@@ -94,6 +94,10 @@ export default class AuthenticationWrapper extends Settingsable
 		// assert( T.isObject(arg_server) && T.isObject(arg_server.server), context + ':apply_middlewares:bad arg_server.server object')
 		// assert( T.isFunction(arg_server.server.use), context + ':apply_middlewares:bad arg_server.server.user function')
 		
+		// DEBUG
+		// debugger
+		// console.log(context + ':apply_middlewares')
+
 		// CHECK SERVER
 		if (! arg_server || ! arg_server.server || ! T.isFunction(arg_server.server.use) )
 		{
@@ -131,7 +135,7 @@ export default class AuthenticationWrapper extends Settingsable
 			if ( T.isFunction(plugin.create_middleware) )
 			{
 				// self.debug('apply_middlewares:get_mw:call plugin.create_middleware()')
-				// console.log('apply_middlewares:loop on plugin:' + plugin.get_name())
+				// console.log(context + ':apply_middlewares:loop on plugin:' + plugin.get_name())
 				
 				const mw = plugin.create_middleware(should_send_error_on_failure)
 				arg_server.server.use(mw)

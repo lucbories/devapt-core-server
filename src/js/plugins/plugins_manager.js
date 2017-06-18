@@ -42,6 +42,17 @@ export default class PluginsManager extends Errorable
 	}
 
 
+	/**
+	 * Get class name.
+	 * 
+	 * @return {string}
+	 */
+	get_class()
+	{
+		return 'PluginsManager'
+	}
+
+
 	get_runtime()
 	{
 		return this._runtime

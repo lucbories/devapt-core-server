@@ -319,6 +319,9 @@ export default class Server extends DistributedInstance
 	{
 		this.enter_group('load')
 		
+		// DEBUG
+		// debugger
+
 		assert( T.isObject(this.$settings) && T.isFunction(this.$settings.has), context + ':bad settings object')
 		
 		const cfg = runtime.get_registry().root
@@ -359,6 +362,9 @@ export default class Server extends DistributedInstance
 		const security_settings = this.get_security_settings()
 		// console.log(context + '.load:security_settings', security_settings)
 		
+		// DEBUG
+		// debugger
+
 		// AUTHENTICATION
 		if ( security_settings && security_settings.hasIn(['authentication', 'enabled']) && security_settings.hasIn(['authentication', 'plugins']) )
 		{

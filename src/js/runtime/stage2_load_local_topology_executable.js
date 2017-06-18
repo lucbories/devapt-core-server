@@ -83,17 +83,20 @@ export default class RuntimeStage2Executable extends RuntimeExecutable
 		
 		const deploy_factory = {
 			create:(arg_type, arg_name, arg_settings)=>{
+				let svc_class_name = undefined
 				switch(arg_type) {
 					case 'service':{
-						const svc_type = arg_settings.get('type', undefined)
-						if (svc_mgr.has(svc_type))
+						svc_class_name = arg_settings.get('type', undefined)
+						// console.log('deploy_factory:create:name=[' + arg_name + '] class=[' + svc_class_name + ']')
+						if (svc_mgr.has(svc_class_name))
 						{
-							return svc_mgr.create(svc_type, arg_name, arg_settings, {})
+							this.debug('deploy_factory:create a service instance for svc type [' + svc_class_name + '] with name [' + arg_name + ']')
+							return svc_mgr.create(svc_class_name, arg_name, arg_settings, {})
 						}
 					}
 				}
 
-				console.error(context + ':DEPLOY LOCAL TOPOLOGY:deploy_factory.create:not found for type ' + arg_type)
+				console.error(context + ':DEPLOY LOCAL TOPOLOGY:deploy_factory.create:class [' + svc_class_name + '] not found for type [' + arg_type + ']')
 				return undefined
 			}
 		}

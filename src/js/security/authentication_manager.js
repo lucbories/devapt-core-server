@@ -85,8 +85,8 @@ export default class AuthenticationManager extends PluginsManager
 		const keys = this.authentication_plugins.toMap().keySeq().toArray()
 		keys.forEach(
 			(key) => {
-				const plugin_cfg = this.authentication_plugins.get(key)
-				plugin_cfg.name = key
+				const plugin_cfg = this.authentication_plugins.get(key).set('name', key)
+				// plugin_cfg.name = key
 				const result = this.load_plugin(plugin_cfg)
 				if (! result)
 				{
@@ -121,9 +121,11 @@ export default class AuthenticationManager extends PluginsManager
 		assert( T.isObject(arg_settings), context + ':load_plugin:bad settings object')
 		assert( T.isFunction(arg_settings.has), context + ':load_plugin:bad settings immutable')
 		assert( arg_settings.has('mode'), context + ':load_plugin:bad settings.mode')
-		assert( T.isString(arg_settings.name) && arg_settings.name.length > 0, context + ':load_plugin:bad settings.name')
+		assert( arg_settings.has('name'), context + ':load_plugin:bad settings.name')
+		const plugin_name = arg_settings.get('name')
+		assert( T.isNotEmptyString(plugin_name), context + ':load_plugin:bad plugin_name string')
 		
-		// console.log(arg_settings.name, context + ':load_plugin:arg_settings.name')
+		// console.log(context + ':load_plugin:plugin_name=[%s]', plugin_name)
 		arg_settings = arg_settings.set('runtime', this.get_runtime() )
 		arg_settings = arg_settings.set('logger_manager', this.get_logger_manager() )
 		
@@ -145,7 +147,8 @@ export default class AuthenticationManager extends PluginsManager
 			//	 return true
 			// }
 			// default: {
-				const plugin = new AuthenticationLowDbPlugin(this, arg_settings.name, context)
+				// TODO NAMe
+				const plugin = new AuthenticationLowDbPlugin(this, plugin_name, context)
 				// self.info(context + ':load_plugin:create plugin for mode [' + mode + '] for name [' + plugin.get_name() + ']')
 				
 				this.register_plugin(plugin)
@@ -305,7 +308,10 @@ export default class AuthenticationManager extends PluginsManager
 		try{
 			const credentials = this.get_credentials(arg_request).get_credentials()
 			
-			if (arg_request.is_authenticated && credentials.username && credentials.password)
+			// DEBUG
+			// debugger
+			
+			if (arg_request.is_authenticated && credentials.user_name && credentials.user_pass_digest)
 			{
 				return true
 			}
@@ -343,7 +349,7 @@ export default class AuthenticationManager extends PluginsManager
 		// console.log(arg_request.url, 'arg_request.url')
 		// console.log(arg_request.queries, 'arg_request.queries')
 		// console.log(arg_request.password, 'arg_request')
-		// console.log(arg_request.query(), 'arg_request.query')
+		console.log(arg_request.query, 'get_credentials(req):arg_request.query')
 		// console.log(arg_request.params, 'arg_request.params')
 		
 		

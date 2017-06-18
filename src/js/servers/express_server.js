@@ -7,6 +7,7 @@ import socketio from 'socket.io'
 import compression from 'compression'
 // import helmet from 'helmet'
 import favicon from 'express-favicon'
+import path from 'path'
 
 // COMMON IMPORTS
 import T from 'devapt-core-common/dist/js/utils/types'
@@ -56,6 +57,8 @@ export default class ExpressServer extends RoutableServer
 	{
 		this.enter_group('build_server')
 		
+		// DEBUG
+		// debugger
 		
 		assert( this.server_protocole == 'http' || this.server_protocole == 'https', context + ':bad protocole for express [' + this.server_protocole + ']')
 		
@@ -131,7 +134,8 @@ export default class ExpressServer extends RoutableServer
 		
 		// DEFAULT VIEW ENGINE
 		// this.server.use( express.bodyParser() )
-		this.server.set('views', runtime.context.get_absolute_path('jade'))
+		// this.server.set('views', runtime.context.get_absolute_path('jade'))
+		this.server.set('views', path.join(runtime.context.get_base_dir(), '../../dist/jade') )
 		this.server.set('view engine', 'jade')
 		
 		
@@ -212,8 +216,8 @@ export default class ExpressServer extends RoutableServer
 		const dir_path = runtime.context.get_absolute_public_path(arg_cfg_route.directory)
 
 		// DEBUG
-		console.log(context + ':get_middleware_for_static_route:express static route', arg_cfg_route)
-		console.log(context + ':ROUTE FOR ASSETS IN DIRECTORY MODE => dir_path=', dir_path)
+		// console.log(context + ':get_middleware_for_static_route:express static route', arg_cfg_route)
+		// console.log(context + ':ROUTE FOR ASSETS IN DIRECTORY MODE => dir_path=', dir_path)
 
 		// STATIC OPTIONS
 		const one_day = 86400000
@@ -222,14 +226,21 @@ export default class ExpressServer extends RoutableServer
 			redirect:false,
 			fallthrough:false,
 			setHeaders:undefined, // function
+			extensions:T.isNotEmptyArray(arg_cfg_route.extensions) ? arg_cfg_route.extensions : false,
 			index:arg_cfg_route.default
 		}
+
+		this.debug('get_middleware_for_static_route:route [' + arg_cfg_route.directory + ']')
+		this.debug('get_middleware_for_static_route:dir_path [' + dir_path + ']')
+		this.debug('get_middleware_for_static_route:route cfg [' + JSON.stringify(arg_cfg_route) + ']')
 
 		return (req, res, next)=>{
 			const asset_path = req._parsedUrl.pathname
 
-			console.log(context + ':get_middleware_for_static_route:express static middleware', arg_cfg_route.directory, req._parsedUrl, dir_path, asset_path)
-			
+			// DEBUG
+			// console.log(context + ':get_middleware_for_static_route:express static middleware', arg_cfg_route.directory, req._parsedUrl, dir_path, asset_path)
+			this.debug('get_middleware_for_static_route:mw callback:asset_path=[' + asset_path + '] directory=[' + arg_cfg_route.directory + ']')
+
 			// debugger
 			
 			// TEST REQUIRED PREFIXES
@@ -293,6 +304,7 @@ export default class ExpressServer extends RoutableServer
 		this.enter_group('add_get_route')
 
 		const route = arg_cfg_route.route_regexp ? arg_cfg_route.route_regexp : arg_cfg_route.full_route
+		this.debug('add_get_route:route [' + route + ']')
 
 		assert( T.isObject(arg_cfg_route),  this.get_context() + '::bad route config object')
 		assert( T.isFunction(arg_callback), this.get_context() + '::bad callback function for route [' + arg_cfg_route.full_route + ']')

@@ -42,6 +42,7 @@ export default class RuntimeStage1Executable extends RuntimeExecutable
 		// SAVE TRACES STATE
 		const saved_trace = this.get_trace()
 		const has_trace = true || this.runtime.get_setting(['trace', 'stages', 'RuntimeStage1', 'enabled'], false)
+		// console.log(context + ':has_trace=', has_trace)
 		if (has_trace)
 		{
 			this.enable_trace()

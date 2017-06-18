@@ -34,13 +34,9 @@ export default class PluginsFactory
 
 		// SERVICES PLUGINS MANAGER
 		this.services_manager = new ServicesManager(arg_runtime, context, arg_runtime.get_logger_manager())
-		// const default_svc_plugin = new DefaultServicePlugin(arg_runtime, this.services_manager)
-		// this.services_manager.register_plugin(default_svc_plugin)
 		
 		
 		// RENDERING PLUGINS MANAGER
-		// const default_plugin_path = arg_runtime.context.get_absolute_path(__dirname, '../../../node_modules', 'devapt-core-common/dist/js/default_plugins/rendering_default_plugin')
-		// const plugins = [default_plugin_path]
 		const plugins = []
 		this.rendering_manager = new RenderingManager(arg_runtime, context, arg_runtime.get_logger_manager())
 		this.rendering_manager.load(plugins)

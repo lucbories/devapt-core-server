@@ -1,7 +1,8 @@
 // NPM IMPORTS
-import assert from 'assert'
-import lowdb from 'lowdb'
-import path from 'path'
+import assert   from 'assert'
+import lowdb    from 'lowdb'
+import storage  from 'lowdb/lib/storages/file-sync'
+import path     from 'path'
 
 // COMMON IMPORTS
 import T from 'devapt-core-common/dist/js/utils/types'
@@ -116,10 +117,9 @@ export default class AuthenticationLowDbPlugin extends AuthenticationPlugin
 					const base_dir = runtime.get_setting('base_dir', null)
 					assert( T.isString(base_dir), context + ':enable:bad base dir string')
 					
-					const json_full_path = path.join(base_dir, 'resources', self.file_name)
+					const json_full_path = path.join(base_dir, '../resources', self.file_name)
 					// console.log(json_full_path, 'json_full_path')
 					
-					const storage = require('lowdb/lib/file-sync')
 					self.file_db = lowdb(json_full_path, {storage})
 					
 					// console.log(self.file_db.object, 'self.file_db.object')
@@ -175,8 +175,9 @@ export default class AuthenticationLowDbPlugin extends AuthenticationPlugin
 		const auth_mgr = runtime.security().get_authentication_manager()
 		
 		return (req, res, next) => {
+			let credentials = undefined
 			try{
-				const credentials = auth_mgr.get_credentials(req)
+				credentials = auth_mgr.get_credentials(req)
 			} catch(e)
 			{
 				console.error(context + ':create_middleware:middleware:exception', e)
@@ -185,8 +186,9 @@ export default class AuthenticationLowDbPlugin extends AuthenticationPlugin
 				return
 			}
 			
-			// console.log('auth_lowdb_plugin.create_middleware', credentials)
-				
+			// DEBUG
+			// console.log('auth_lowdb_plugin.create_middleware:credential=', credentials)
+			
 			if ( auth_mgr.check_request_authentication(req) )
 			{
 				// console.log(context + ':auth_lowdb_plugin.create_middleware.request is already authenticated')
@@ -307,10 +309,11 @@ export default class AuthenticationLowDbPlugin extends AuthenticationPlugin
 			// console.log(context + '.authenticate:db', this.file_db.object)
 			// console.log(context + '.authenticate:query', query)
 			
-			const users = this.file_db('users').find(query)
+			const users = this.file_db.get('users').find(query).value()
 			if (users)
 			{
-				const first_user = (T.isArray(users) && users.length > 0) ? users[0] : (T.isObject(users) ? users : null)
+				// const first_user = (T.isArray(users) && users.length > 0) ? users[0] : (T.isObject(users) ? users : null)
+				const first_user = users
 				if ( T.isFunction(arg_credentials.done_cb) )
 				{
 					arg_credentials.done_cb(first_user)

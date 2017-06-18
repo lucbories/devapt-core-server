@@ -36,6 +36,17 @@ export default class FeaturesManager extends PluginsManager
 		
 		this.instances = { 'all':{} }
 	}
+
+
+	/**
+	 * Get class name.
+	 * 
+	 * @return {string}
+	 */
+	get_class()
+	{
+		return 'FeaturesManager'
+	}
 	
 	
     
@@ -51,13 +62,18 @@ export default class FeaturesManager extends PluginsManager
      */
 	create(arg_class_name, arg_name, arg_settings, arg_state)
 	{
+		this.enter_group('create')
+
 		assert( T.isString(arg_class_name), context + ':bad class string')
-		assert( T.isString(arg_name), context + ':bad name string')
-		assert( T.isObject(arg_settings), context + ':bad settings object')
+		assert( T.isString(arg_name), context + ':bad name string for class [' + arg_class_name + ']')
+		assert( T.isObject(arg_settings), context + ':bad settings object [' + arg_class_name + '] for name [' + arg_name + ']')
 		if (arg_state)
 		{
 			assert( T.isObject(arg_state), context + ':bad state object')
 		}
+		this.debug('create:name=[' + arg_name + '] class=[' + arg_class_name + ']')
+		// console.log(context + ':create:name=[' + arg_name + '] class=[' + arg_class_name + ']')
+
 		arg_settings = arg_settings.set('runtime', this.get_runtime())
 		arg_settings = arg_settings.set('logger_manager', this.get_logger_manager())
 		
@@ -76,11 +92,13 @@ export default class FeaturesManager extends PluginsManager
 			
 			this.add_instance(instance)
 			
+			this.leave_group('create:instance [' + arg_name + '] of class [' + arg_class_name + '] created with plugin [' + found_plugin.get_name() + ']')
 			return instance
 		}
 		
 		console.error(context + ':create:feature not found with type=' + arg_class_name + ' name=' + arg_name)
 		
+		this.leave_group('create:class [' + arg_class_name + '] not found for [' + arg_name + ']')
 		return undefined
 	}
 	

@@ -26,6 +26,17 @@ export default class ServicesManager extends FeaturesManager
 		
 		this.is_service_manager = true
 	}
+
+
+	/**
+	 * Get class name.
+	 * 
+	 * @return {string}
+	 */
+	get_class()
+	{
+		return 'ServicesManager'
+	}
 	
 	
 	/**

@@ -105,6 +105,11 @@ export default class Node extends NodeMessaging
 
 		this.enable_on_bus(this.msg_bus, 'default', 'receive_msg')
 
+		if (this.is_master)
+		{
+			this.enable_on_bus(this.msg_bus, 'default', 'receive_msg', 'master')
+		}
+	
 		// DEBUG
 		// if (! this.is_master)
 		// {
@@ -217,8 +222,11 @@ export default class Node extends NodeMessaging
 		if (bindings)
 		{
 			const bindings_js = bindings.toJS()
+
+			// DEBUG
 			// console.log(context + ':load_topology_settings:settings.servers_bindings', bindings_js)
-			// assert( T.isArray(bindings_js), context + ':load_topology_settings:bad settings.servers_bindings array')
+			assert( T.isArray(bindings_js), context + ':load_topology_settings:bad settings.servers_bindings array')
+			
 			bindings_js.forEach(
 				(binding_record) => {
 					if (binding_record.node == this.get_name() && servers.has(binding_record.server) )
@@ -295,7 +303,9 @@ export default class Node extends NodeMessaging
 	receive_msg(arg_msg)
 	{
 		this.enter_group('receive_msg')
-		console.log(context + ':receive_msg:from=%s to=%s', arg_msg.get_sender(), arg_msg.get_target())
+
+		// DEBUG
+		// console.log(context + ':receive_msg:from=%s to=%s', arg_msg.get_sender(), arg_msg.get_target())
 
 		// DO NOT PROCESS MESSAGES FROM SELF
 		if (arg_msg.get_sender() == this.get_name())
