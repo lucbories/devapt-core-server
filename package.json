@@ -51,6 +51,8 @@
     "cache-manager": ">=2.1.2",
     "chokidar": ">=1.4.3",
     "compression": ">=1.6.1",
+    "devapt-core-common": ">=2.0.0",
+    "devapt-core-services": ">=2.0.0",
     "es6-symbol": ">=3.1.0",
     "express": ">=4.13.3",
     "express-favicon": ">=1.0.1",

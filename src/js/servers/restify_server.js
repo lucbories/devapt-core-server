@@ -159,8 +159,28 @@ export default class RestifyServer extends RoutableServer
 		// DEBUG
 		console.log(context + ':get_middleware_for_static_route:express static route', arg_cfg_route)
 
+
+		// SEARCH ASSETS DIRECTORY
+		let dir_path = undefined
+		if ( path.isAbsolute(arg_cfg_route.directory) )
+		{
+			dir_path = arg_cfg_route.directory
+		}
+		if ( ! dir_path && T.isNotEmptyString(arg_cfg_route.pkg_base_dir) )
+		{
+			dir_path = runtime.context.get_absolute_path(arg_cfg_route.pkg_base_dir, arg_cfg_route.directory)
+		}
+		if ( ! dir_path && T.isNotEmptyString(arg_cfg_route.app_base_dir) )
+		{
+			dir_path = runtime.context.get_absolute_path(arg_cfg_route.app_base_dir, '../public', arg_cfg_route.directory)
+		}
+		if ( ! dir_path )
+		{
+			dir_path = runtime.context.get_absolute_public_path(arg_cfg_route.directory)
+		}
+
 		const cb_arg = {
-			directory: arg_cfg_route.directory
+			directory: dir_path
 		}
 
 		if ( T.isString(arg_cfg_route.default_file) )
