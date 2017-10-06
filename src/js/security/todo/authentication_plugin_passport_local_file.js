@@ -1,8 +1,9 @@
 
 // NPM IMPORTS
-import assert from 'assert'
-import lowdb from 'lowdb'
-import path from 'path'
+import assert     from 'assert'
+import lowdb      from 'lowdb'
+import FileAsync  from 'lowdb/adapters/FileAsync'
+import path       from 'path'
 
 // COMMON IMPORTS
 import T from 'devapt-core-common/dist/js/utils/types'
@@ -89,10 +90,10 @@ export default class AuthenticationPluginPassportLocalFile extends Authenticatio
                     
                     // OPEN DATABASE
                     const db_settings = {
-                        autosave:true,
-                        async:true
+                        autosave:true
                     }
-                    this.file_db = lowdb(json_full_path, db_settings)
+                    this.file_adapter = new FileAsync(json_full_path, db_settings)
+                    this.file_db = lowdb(this.file_adapter)
                 }
             )
         }

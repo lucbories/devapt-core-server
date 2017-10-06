@@ -1,7 +1,7 @@
 {
   "name": "devapt-core-server",
-  "version": "2.0.0",
-  "description": "Developpers Application Toolkit - build application (backend, frontend, RESTfull, API, distributed nodes, reactive...) from configuration",
+  "version": "2.0.1",
+  "description": "Developpers Application Toolkit - server standard features: plugins, metrics, servers, security",
   "author": {
     "name": "Luc BORIES",
     "email": "luc.bories@gmail.com",
@@ -66,7 +66,7 @@
     "immutable": ">=3.7.5",
     "jade": ">=1.11.0",
     "lodash": ">=4.16.4",
-    "lowdb": ">=0.12.5",
+    "lowdb": ">=1.0.0",
     "moment": ">=2.13.0",
     "mustache": ">=2.2.1",
     "node-cache": ">=3.2.1",

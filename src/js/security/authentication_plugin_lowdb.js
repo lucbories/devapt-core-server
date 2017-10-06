@@ -1,7 +1,7 @@
 // NPM IMPORTS
 import assert   from 'assert'
 import lowdb    from 'lowdb'
-import storage  from 'lowdb/lib/storages/file-sync'
+import FileSync  from 'lowdb/adapters/FileSync'
 import path     from 'path'
 
 // COMMON IMPORTS
@@ -120,7 +120,8 @@ export default class AuthenticationLowDbPlugin extends AuthenticationPlugin
 					const json_full_path = path.join(base_dir, '../resources', self.file_name)
 					// console.log(json_full_path, 'json_full_path')
 					
-					self.file_db = lowdb(json_full_path, {storage})
+					self.file_adapter = new FileSync(json_full_path)
+					self.file_db = lowdb(self.file_adapter)
 					
 					// console.log(self.file_db.object, 'self.file_db.object')
 					// console.log( require(json_full_path), 'self.file_db JSON file')
