@@ -1,6 +1,6 @@
 {
   "name": "devapt-core-server",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Developpers Application Toolkit - server standard features: plugins, metrics, servers, security",
   "author": {
     "name": "Luc BORIES",
@@ -64,7 +64,7 @@
     "html-entities": "^1.2.0",
     "html-to-vdom": ">=0.7.0",
     "immutable": ">=3.7.5",
-    "jade": ">=1.11.0",
+    "pug": ">=0.1.0",
     "lodash": ">=4.16.4",
     "lowdb": ">=1.0.0",
     "moment": ">=2.13.0",
