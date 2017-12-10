@@ -11,17 +11,37 @@ export default class MetricDuration extends MetricsRecord
 {
     /**
      * MetricDuration constructor.
-	 * @extends Metric
+	 * 
 	 * @returns {nothing}
      */
 	constructor()
 	{
 		super()
+
+		/**
+		 * Timestamp after.
+		 * @type {integer}
+		 */
+		this.ts_after
+		
+		/**
+		 * Timestamp after.
+		 * @type {integer}
+		 */
+		this.ts_at
+		
+		/**
+		 * Timestamp after.
+		 * @type {integer}
+		 */
+		this.ts_before
 	}
 	
 	
 	/**
-     * Executed before request processing
+     * Executed before request processing.
+	 * 
+	 * @returns {nothing}
      */
 	before()
 	{
@@ -30,7 +50,9 @@ export default class MetricDuration extends MetricsRecord
 	
 	
 	/**
-     * Executed at each request processing iteration
+     * Executed at each request processing iteration.
+	 * 
+	 * @returns {nothing}
      */
 	iteration()
 	{
@@ -40,7 +62,9 @@ export default class MetricDuration extends MetricsRecord
 	
 	
 	/**
-     * Executed after request processing
+     * Executed after request processing.
+	 * 
+	 * @returns {nothing}
      */
 	after()
 	{
@@ -49,7 +73,9 @@ export default class MetricDuration extends MetricsRecord
 	
 	
 	/**
-     * Returns metrics values plain object
+     * Returns metrics values plain object.
+	 * 
+	 * @returns {object}
      */
 	get_values()
 	{

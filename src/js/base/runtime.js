@@ -17,14 +17,24 @@ import Security from './security'
 import * as exec from '../runtime/index'
 
 
-let context = 'server/base/runtime'
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
+const context = 'server/base/runtime'
 
-
-
-const logger_console_file = 'devapt-core-common/dist/js/loggers/logger_console'
 
 /**
- * DEFAULT RUNTIME SETTINGS
+ * Console logger class path file.
+ * @type {string}
+ */
+const logger_console_file = 'devapt-core-common/dist/js/loggers/logger_console'
+
+
+/**
+ * Default runtime settings.
+ * @type {object}
  */
 const default_settings = {
 	'is_master':false,
@@ -55,7 +65,6 @@ class Runtime extends RuntimeBase
 {
 	/**
 	 * Create a Runtime instance.
-	 * @extends RuntimeBase
 	 * 
 	 * @returns {nothing}
 	 */
@@ -64,24 +73,89 @@ class Runtime extends RuntimeBase
 		super(context)
 		
 		// SET DEFAULT ATTRIBUTES VALUES
+		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_server_runtime = true
+		
+		/**
+		 * Is master node flag.
+		 * @type {boolean}
+		 */
 		this.is_master = false
+		
+		/**
+		 * Unique node id.
+		 * @type {string}
+		 */
 		this.uid = os.hostname() + '_' + process.pid
 		
+		/**
+		 * Runtime settings.
+		 * @private
+		 * @type {Immutable.Map}
+		 */
+		this.$settings = undefined
+		
+		/**
+		 * Runtime node.
+		 * @type {Node}
+		 */
 		this.node = null
 		
+		/**
+		 * Plugins factory instance.
+		 * @type {PluginsFactory}
+		 */
 		this.plugins_factory = undefined
+
+		/**
+		 * Runtime context instance.
+		 * @type {Context}
+		 */
 		this.context = new Context(this)
+
+		/**
+		 * Security manager instance.
+		 * @type {SecurityManager}
+		 */
 		this.security_mgr = new Security(this, context, { 'logger_manager':this.get_logger_manager() } )
 		
+		/**
+		 * Topology state registry.
+		 * @private
+		 * @type {TopologyRegistry}
+		 */
 		this._state_store = topology_registry
+
+		/**
+		 * Topology state registry.
+		 * @type {TopologyRegistry}
+		 */
 		this.topology_registry = topology_registry
+
+		/**
+		 * Topology world definition instance.
+		 * @type {TopologyDefineWorld}
+		 */
 		this.defined_world_topology = undefined
+		
+		/**
+		 * Topology world deployment instance.
+		 * @type {TopologyDeploymentWorld}
+		 */
 		this.deployed_local_topology= undefined
 
+		/**
+		 * Servers using socketio.
+		 * @type {object}
+		 */
 		this.socketio_servers = {}
 		
 		this.info('Runtime is created')
+		// console.log('Runtime is created')
 	}
 	
 	
@@ -167,6 +241,7 @@ class Runtime extends RuntimeBase
 	 */
 	load(arg_settings)
 	{
+		// console.log(context + ':load')
 		const self = this
 
 		// MERGE DEFAULT AND RUNTIME SETTINGS
@@ -226,7 +301,7 @@ class Runtime extends RuntimeBase
 				() => {
 					if (self.get_logger_manager().loggers.length > console_logger_index && self.get_logger_manager().loggers[console_logger_index].get_uid() == console_logger_uid)
 					{
-						console.log(context + ':load:remove console logger at ' + console_logger_index)
+						// console.log(context + ':load:remove console logger at ' + console_logger_index)
 						self.get_logger_manager().loggers.splice(console_logger_index, 1)
 					}
 				}
@@ -310,19 +385,9 @@ class Runtime extends RuntimeBase
 		assert( T.isObject(arg_socketio) && arg_socketio.emit && arg_socketio.on, context + ':on_socketio_connect:bad socketio server')
 		assert( T.isObject(arg_socket) && arg_socket.emit && arg_socket.on, context + ':on_socketio_connect:bad socketio socket client')
 
-		// const self = this
 		console.info(context + ':on_socketio_connect:socket connected')
 		
 		arg_socket.emit('welcome on /', { from: 'server runtime' })
-		
-		// ON PING
-		// arg_socket.on('ping',
-		// 	function(data)
-		// 	{
-		// 		console.info(context + ':on_socketio_connect:socket receives ping', data)
-		// 		arg_socket.emit('pong', { from: 'server runtime' })
-		// 	}
-		// )
 	}
 	
 	
@@ -337,7 +402,16 @@ class Runtime extends RuntimeBase
 }
 
 
-let runtime_singleton = new Runtime()
+/**
+ * Runtime singleton instance.
+ * @private
+ * @type {Runtime}
+ */
+const runtime_singleton = new Runtime()
 register_runtime(runtime_singleton)
 
+/**
+ * Runtime singleton instance.
+ * @type {Runtime}
+ */
 export default runtime_singleton

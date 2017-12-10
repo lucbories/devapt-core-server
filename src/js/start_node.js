@@ -43,11 +43,14 @@ const DEVAPT_NODE_CFG = path.join(topology_dir, '../nodes', DEVAPT_NODE_NAME + '
 // DEBUG
 // console.log(process.env, 'process.env')
 // console.log(process.env.OPENSHIFT_HOMEDIR, 'process.env.OPENSHIFT_HOMEDIR')
-// console.log(root_dir, 'root_dir')
-// console.log(process.env.OPENSHIFT_NODEJS_IP, 'process.env.OPENSHIFT_NODEJS_IP')
-// console.log(process.env.OPENSHIFT_NODEJS_PORT, 'process.env.OPENSHIFT_NODEJS_PORT')
+
 // console.log(commander.nodeName, 'commander.nodeName')
-// console.log(commander.resourcesDirectory, 'commander.resourcesDirectory')
+// console.log(commander.topologyDirectory, 'commander.topologyDirectory')
+
+// console.log(root_dir, 'root_dir')
+// console.log(topology_dir, 'topology_dir')
+
+// console.log(DEVAPT_NODE_NAME, 'DEVAPT_NODE_NAME')
 // console.log(DEVAPT_NODE_CFG, 'DEVAPT_NODE_CFG')
 
 
@@ -92,7 +95,7 @@ if (commander.serversBindings)
 		}
 	)
 }
-
+// console.log('runtime_settings', runtime_settings)
 
 const DEBUG = false
 

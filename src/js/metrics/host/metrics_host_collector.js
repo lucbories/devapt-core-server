@@ -5,6 +5,11 @@ import MetricsHostState from './metrics_host_state'
 import MetricsHostReducer from './metrics_host_reducer'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/metrics/host/metrics_host_collector'
 
 
@@ -27,9 +32,35 @@ export default class MetricsHostCollector extends MetricsCollector
 	{
 		super(arg_settings, (arg_log_context ? arg_log_context : context))
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_host_collector = true
 		
+		/**
+		 * Timer instance.
+		 * @type {Timer}
+		 */
 		this.scheduler = undefined
+
+		/**
+		 * Metrics reducer instance.
+		 * @type {MetricsReducer}
+		 */
+		this.metrics_reducer = undefined
+		
+		/**
+		 * Metrics state instance.
+		 * @type {MetricsState}
+		 */
+		this.metrics_state = undefined
+		
+		/**
+		 * Metrics record instance.
+		 * @type {MetricsRecord}
+		 */
+		this.metrics_record = undefined
 	}
 	
 	

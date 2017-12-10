@@ -5,6 +5,11 @@ import assert from 'assert'
 import T from 'devapt-core-common/dist/js/utils/types'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/metrics/base/metrics_reducer'
 
 
@@ -26,8 +31,16 @@ export default class MetricsReducer
 	*/
 	constructor(arg_metrics_name)
 	{
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_reducer = true
 		
+		/**
+		 * Metrics series name.
+		 * @type {string}
+		 */
 		this.name = arg_metrics_name
 	}
 	

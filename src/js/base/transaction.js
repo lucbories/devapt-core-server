@@ -9,17 +9,62 @@ import Instance  from 'devapt-core-common/dist/js/base/instance'
 import MetricDuration from '../metrics/metric_duration'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'common/base/transaction'
 
 
 
+/**
+ * Transaction type:Sequence.
+ * @private
+ * @type {string}
+ */
 const TYPE_SEQUENCE  = 'SEQUENCE'
+
+/**
+ * Transaction type:Every.
+ * @private
+ * @type {string}
+ */
 const TYPE_EVERY  = 'EVERY'
+
+/**
+ * Transaction type:Only one.
+ * @private
+ * @type {string}
+ */
 const TYPE_ONE  = 'ONE'
 
+/**
+ * Transaction status:Is created.
+ * @private
+ * @type {string}
+ */
 const STATUS_CREATED  = 'CREATED'
+
+/**
+ * Transaction status:Is prepared.
+ * @private
+ * @type {string}
+ */
 const STATUS_PREPARED = 'PREPARED'
+
+/**
+ * Transaction status:Execution is OK.
+ * @private
+ * @type {string}
+ */
 const STATUS_EXEC_OK  = 'EXEC_OK'
+
+/**
+ * Transaction status:Execution has failed.
+ * @private
+ * @type {string}
+ */
 const STATUS_EXEC_KO  = 'EXEC_KO'
 
 
@@ -33,20 +78,43 @@ export default class Transaction extends Instance
 {
 	/**
 	 * Create a Transaction. Set status to CREATED.
-	 * @extends Instance
+	 * 
 	 * @param {string} arg_app_name - application name.
 	 * @param {string} arg_svc_name - service name.
 	 * @param {string} arg_tx_name - transaction name.
 	 * @param {object} arg_settings - settings
 	 * @param {Array} arg_executables - executables array (optional)
 	 * @param {string} arg_type - transaction type (optional)
+	 * 
 	 * @returns {nothing}
 	 */
 	constructor(arg_app_name, arg_svc_name, arg_tx_name, arg_settings, arg_executables, arg_type)
 	{
 		super('transactions', 'Transaction', arg_tx_name, arg_settings, context)
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_transaction = true
+		
+		/**
+		 * Executables array.
+		 * @type {array}
+		 */
+		this.executables = []
+		
+		/**
+		 * Results array.
+		 * @type {array}
+		 */
+		this.results = []
+
+		/**
+		 * Transaction type.
+		 * @type {string}
+		 */
+		this.tx_type = undefined
 		
 		if (arg_executables)
 		{
@@ -55,10 +123,22 @@ export default class Transaction extends Instance
 		
 		this.set_type(arg_type)
 		
-		this.metric_duration = new MetricDuration() 
+		/**
+		 * Duration metric instance.
+		 * @type {MetricDuration}
+		 */
+		this.metric_duration = new MetricDuration()
+
+		/**
+		 * Metrics array.
+		 * @type {Array}
+		 */
 		this.metrics = [this.metric_duration]
-		// this.metrics = []
-		
+
+		/**
+		 * Transaction status.
+		 * @type {string}
+		 */
 		this.status = STATUS_CREATED
 	}
 	
@@ -70,12 +150,15 @@ export default class Transaction extends Instance
 	 */
 	set_executables(arg_executables)
 	{
+		// console.log(context + 'set_executables')
+
 		// ASSUME AN ARRAY
 		this.executables = T.isArray(arg_executables) ? arg_executables : [arg_executables]
 		
 		// CHECK ARRAY ITEMS
 		this.executables.forEach(
 			(executable, index) => {
+				// console.log(context + ':set_executables:index=' + index)
 				assert( T.isObject(executable) && executable.is_executable, context + ':bad executable type at [' + index + ']')
 			}
 		)
@@ -92,6 +175,8 @@ export default class Transaction extends Instance
 	 */
 	set_type(arg_type)
 	{
+		// console.log(context + ':set_type:type=[' + arg_type + ']')
+
 		if ( ! T.isString(arg_type) )
 		{
 			arg_type = TYPE_EVERY
@@ -99,11 +184,13 @@ export default class Transaction extends Instance
 		
 		switch(arg_type)
 		{
-			case TYPE_EVERY:	this.tx_type = TYPE_EVERY; return
-			case TYPE_ONE:	    this.tx_type = TYPE_ONE; return
+			case TYPE_EVERY:	this.tx_type = TYPE_EVERY   ; return
+			case TYPE_ONE:	    this.tx_type = TYPE_ONE     ; return
 			case TYPE_SEQUENCE: this.tx_type = TYPE_SEQUENCE; return
 		}
 		
+		// console.log(context + ':set_type:type not found => default=[' + TYPE_EVERY + ']')
+
 		this.tx_type = TYPE_EVERY
 	}
 	
@@ -115,10 +202,14 @@ export default class Transaction extends Instance
 	 */
 	prepare(arg_context)
 	{
+		// debugger
+		// console.log(context + 'prepare:type=', this.tx_type)
+
 		this.metrics.forEach( (metric)=>{ metric.before() } )
 		
 		this.executables.forEach(
-			(executable) => {
+			(executable, index) => {
+				// console.log(context + 'prepare:index=' + index)
 				executable.prepare(arg_context)
 			}
 		)
@@ -135,6 +226,8 @@ export default class Transaction extends Instance
 	 */
 	execute(arg_data)
 	{
+		// console.log(context + ':execute:type=', this.tx_type)
+
 		switch(this.tx_type)
 		{
 			case TYPE_EVERY: {
@@ -168,7 +261,8 @@ export default class Transaction extends Instance
 		{
 			let tx_promises = []
 			this.executables.forEach(
-				(executable) => {
+				(executable, index) => {
+					// console.log(context + 'execute:index=' + index)
 					let exec_promise = executable.execute(arg_data)
 					tx_promises.push(exec_promise)
 					
@@ -321,6 +415,8 @@ export default class Transaction extends Instance
 	 */
 	execute_sequence(arg_data)
 	{
+		// console.log(context + ':execute_sequence')
+
 		this.enter_group('execute a sequence of executables')
 		
 		const self = this
@@ -399,7 +495,7 @@ export default class Transaction extends Instance
 			tx_promise = tx_promise.then(
 				function(result)
 				{
-					console.log('executable success')
+					// console.log('executable success')
 					
 					self.metric_duration.after()
 					
@@ -437,6 +533,8 @@ export default class Transaction extends Instance
 			this.rollback()
 		}
 		
+		console.log(context + 'execute a sequence of executables (KO) (async)')
+
 		this.leave_group('execute a sequence of executables (KO) (async)')
 		return Promise.resolve(false)
 	}
@@ -555,15 +653,18 @@ export default class Transaction extends Instance
 
 /**
  * Transaction type SEQUENCE: all executables are run one at a time in the registered order.
+ * @type {string}
  */
 Transaction.SEQUENCE = TYPE_SEQUENCE
 
 /**
  * Transaction type ONE: all executables are run at the same time without order and transaction ends when a run finish.
+ * @type {string}
  */
 Transaction.ONE = TYPE_ONE
 
 /**
  * Transaction type EVERY: all executables are run at the same time without order.
+ * @type {string}
  */
 Transaction.EVERY = TYPE_EVERY

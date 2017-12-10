@@ -20,12 +20,25 @@ export default class MetricsState
      */
 	constructor(arg_metrics_name)
 	{
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_state  = true
 		
+		/**
+		 * Metrics series name.
+		 * @type {string}
+		 */
 		this.name = arg_metrics_name
+		
+		/**
+		 * Metrics state values.
+		 * @type {object}
+		 */
 		this.values = {}
 		
-		// METRIC TYPE
+		// SET METRIC TYPE NAME
 		this.values.metric = this.get_name()
 	}
 	

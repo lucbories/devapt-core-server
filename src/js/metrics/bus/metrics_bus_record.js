@@ -18,22 +18,46 @@ export default class MetricsBusRecord extends MetricsRecord
     /**
      * Metrics bus record constructor.
 	 * 
+	 * @param {string}     arg_bus_name - monitored bus name.
+	 * @param {MessageBus} arg_bus      - monitored bus instance.
+	 * 
 	 * @returns {nothing}
      */
 	constructor(arg_bus_name, arg_bus)
 	{
 		super('bus')
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_record_bus  = true
 		
+		/**
+		 * Monitored bus name.
+		 * @type {string}
+		 */
 		this.bus_name = arg_bus_name
+
+		/**
+		 * Monitored bus instance.
+		 * @type {MessageBus}
+		 */
 		this.bus = arg_bus
+		
+		/**
+		 * Metrics record values.
+		 * @type {object}
+		 */
+		this.values = {}
 	}
 	
 	
 	
 	/**
-     * Executed before request processing
+     * Executed before request processing.
+	 * 
+	 * @returns {nothing}
      */
 	before()
 	{
@@ -59,7 +83,9 @@ export default class MetricsBusRecord extends MetricsRecord
 	
 	
 	/**
-     * Executed at each request processing iteration
+     * Executed at each request processing iteration.
+	 * 
+	 * @returns {nothing}
      */
 	iteration()
 	{
@@ -85,7 +111,9 @@ export default class MetricsBusRecord extends MetricsRecord
 	
 	
 	/**
-     * Executed after request processing
+     * Executed after request processing.
+	 * 
+	 * @returns {nothing}
      */
 	after()
 	{

@@ -19,7 +19,6 @@ export default class MetricsHostRecord extends MetricsRecord
 {
     /**
      * Metrics host record constructor.
-	 * @extends MetricsRecord
 	 * 
 	 * @returns {nothing}
      */
@@ -27,13 +26,25 @@ export default class MetricsHostRecord extends MetricsRecord
 	{
 		super('host')
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_record_host  = true
+		
+		/**
+		 * Metrics record values.
+		 * @type {object}
+		 */
+		this.values = {}
 	}
 	
 	
 	
 	/**
-     * Executed before request processing
+     * Executed before request processing.
+	 * 
+	 * @returns {nothing}
      */
 	before()
 	{
@@ -64,7 +75,9 @@ export default class MetricsHostRecord extends MetricsRecord
 	
 	
 	/**
-     * Executed at each request processing iteration
+     * Executed at each request processing iteration.
+	 * 
+	 * @returns {nothing}
      */
 	iteration()
 	{
@@ -73,7 +86,9 @@ export default class MetricsHostRecord extends MetricsRecord
 	
 	
 	/**
-     * Executed after request processing
+     * Executed after request processing.
+	 * 
+	 * @returns {nothing}
      */
 	after()
 	{

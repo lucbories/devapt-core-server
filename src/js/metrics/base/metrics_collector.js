@@ -9,14 +9,33 @@ import Settingsable from 'devapt-core-common/dist/js/base/settingsable'
 import runtime from '../../base/runtime'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/metrics/base/metrics_collector'
 
 
 /**
- * Metrics collector status.
+ * Metrics collector status:Is created.
+ * @private
+ * @type {string}
  */
 const STATUS_CREATED = 'CREATED'
+
+/**
+ * Metrics collector status:Is initialized.
+ * @private
+ * @type {string}
+ */
 const STATUS_INITIALIZED = 'INITIALIZED'
+
+/**
+ * Metrics collector status:Is closed.
+ * @private
+ * @type {string}
+ */
 const STATUS_CLOSED = 'CLOSED'
 
 
@@ -41,13 +60,36 @@ export default class MetricsCollector extends Settingsable
 	{
 		super(arg_settings, (arg_log_context ? arg_log_context : context))
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_collector = true
 		
+		/**
+		 * Metrics collector status.
+		 * @private
+		 * @type {string}
+		 */
 		this.$state = STATUS_CREATED
 		
+		
+		/**
+		 * Metrics server name.
+		 * @type {string}
+		 */
 		this.metrics_server_name = undefined
 
+		/**
+		 * Metrics reducer instance.
+		 * @type {MetricsReducer}
+		 */
 		this.metrics_reducer = undefined
+		
+		/**
+		 * Metrics state instance.
+		 * @type {MetricsState}
+		 */
 		this.metrics_state = undefined
 	}
 	
@@ -107,10 +149,10 @@ export default class MetricsCollector extends Settingsable
 		this.flush()
 		this.$state = STATUS_CLOSED
 		
-		delete this.metric_reducer
+		delete this.metrics_reducer
 		delete this.metrics_state
 		
-		this.metric_reducer = undefined
+		this.metrics_reducer = undefined
 		this.metrics_state = undefined
 	}
 	

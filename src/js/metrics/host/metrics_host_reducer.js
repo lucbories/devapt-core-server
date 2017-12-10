@@ -16,7 +16,6 @@ export default class MetricsHostReducer extends MetricsReducer
 {
 	/**
 	 * Reducer for Host metric class.
-	 * @extends MetricsReducer
 	 * 
 	 * @returns {nothing}
 	*/

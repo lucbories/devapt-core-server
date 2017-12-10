@@ -139,9 +139,13 @@ export default class ExpressServer extends RoutableServer
 		
 		// DEFAULT VIEW ENGINE
 		// this.server.use( express.bodyParser() )
-		// this.server.set('views', runtime.context.get_absolute_path('jade'))
-		this.server.set('views', path.join(runtime.context.get_base_dir(), '../../dist/jade') )
-		this.server.set('view engine', 'jade')
+		const views_servers_dir = path.join(runtime.context.get_base_dir(), '../../dist/pug')
+		const views_app_dir = runtime.context.get_absolute_path('../../../dist/pug')
+		const views_dir = path.isAbsolute(views_app_dir) ? views_app_dir : views_servers_dir
+		console.log(context + ':views_dir', views_dir)
+
+		this.server.set('views', views_dir)
+		this.server.set('view engine', 'pug')
 		
 		
 		this.leave_group('build_server')
@@ -160,7 +164,7 @@ export default class ExpressServer extends RoutableServer
 				// SEND HTML RESPONSE
 				if (req.accepts('html'))
 				{
-					res.render('404', { url: req.url })
+					res.render('404.pug', { url: req.url })
 					return
 				}
 

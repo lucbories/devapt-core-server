@@ -16,7 +16,6 @@ export default class MetricsHttpState extends MetricsState
 {
     /**
      * Metrics http state constructor.
-	 * @extends MetricsState
 	 * 
 	 * @returns {nothing}
      */
@@ -24,7 +23,17 @@ export default class MetricsHttpState extends MetricsState
 	{
 		super('http')
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_http_state = true
+		
+		/**
+		 * Metrics state values.
+		 * @type {object}
+		 */
+		this.values = {}
 		
 		// REQUEST VERSIONS
 		this.values.version_counters = {}

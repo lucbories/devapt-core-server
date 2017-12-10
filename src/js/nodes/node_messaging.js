@@ -7,7 +7,12 @@ import DistributedInstance from 'devapt-core-common/dist/js/base/distributed_ins
 
 
 
-let context = 'server/nodes/node_messaging'
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
+const context = 'server/nodes/node_messaging'
 
 
 const STATE_CREATED = 'NODE_IS_CREATED'

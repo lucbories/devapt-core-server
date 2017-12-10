@@ -8,6 +8,11 @@ import T from 'devapt-core-common/dist/js/utils/types'
 import MetricsState from '../base/metrics_state'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/metrics/nodejs/metrics_nodejs_state'
 
 
@@ -29,7 +34,17 @@ export default class MetricNodeJsState extends MetricsState
 	{
 		super('nodejs')
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_node_state = true
+		
+		/**
+		 * Metrics state values.
+		 * @type {object}
+		 */
+		this.values = {}
 	}
 	
 	

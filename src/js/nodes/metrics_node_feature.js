@@ -11,7 +11,12 @@ import MetricsServer from '../servers/metrics_server'
 
 
 
-let context = 'server/nodes/metrics_node_feature'
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
+const context = 'server/nodes/metrics_node_feature'
 
 
 
@@ -24,7 +29,6 @@ export default class MetricsNodeFeature extends NodeFeature
 {
 	/**
 	 * Create a MetricsNodefeature instance.
-	 * @extends NodeFeature
 	 * 
 	 * @param {Node} arg_node - node instance.
 	 * @param {string} arg_name - feature name.

@@ -8,6 +8,11 @@ import T from 'devapt-core-common/dist/js/utils/types'
 import MetricsState from '../base/metrics_state'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/metrics/host/metrics_host_state'
 
 
@@ -21,7 +26,6 @@ export default class MetricHostState extends MetricsState
 {
     /**
      * Metrics host state constructor.
-	 * @extends MetricsState
 	 * 
 	 * @returns {nothing}
      */
@@ -29,6 +33,10 @@ export default class MetricHostState extends MetricsState
 	{
 		super('host')
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_host_state = true
 	}
 	

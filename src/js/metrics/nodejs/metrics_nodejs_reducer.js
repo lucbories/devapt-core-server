@@ -16,13 +16,18 @@ export default class MetricsNodeReducer extends MetricsReducer
 {
 	/**
 	 * Reducer for NodeJs metric class.
-	 * @extends MetricsReducer
 	 * 
 	 * @returns {nothing}
 	*/
 	constructor()
 	{
 		super('nodejs')
+		
+		/**
+		 * Metrics record values.
+		 * @type {object}
+		 */
+		this.values = {}
 	}
 	
 	

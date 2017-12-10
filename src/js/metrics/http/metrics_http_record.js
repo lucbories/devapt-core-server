@@ -33,15 +33,38 @@ export default class MetricsHttpRecord extends MetricsRecord
 	{
 		super('http')
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_http_record  =true
 		
+		/**
+		 * Server instance.
+		 * @type {Server}
+		 */
 		this.server = undefined
 		
+		/**
+		 * Request instance.
+		 * @type {object}
+		 */
 		this.req = arg_request
+		
+		/**
+		 * Response instance.
+		 * @type {object}
+		 */
 		this.res = arg_response
 		
 		this.req.devapt_metrics = this
 		this.res.devapt_metrics = this
+		
+		/**
+		 * Metrics record values.
+		 * @type {object}
+		 */
+		this.values = {}
 	}
 	
     

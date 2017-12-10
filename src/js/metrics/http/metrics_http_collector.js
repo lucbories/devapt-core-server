@@ -12,6 +12,11 @@ import MetricsHttpReducer from './metrics_http_reducer'
 
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/metrics/host/metrics_host_collector'
 
 
@@ -34,7 +39,23 @@ export default class MetricsHttpCollector extends MetricsCollector
 	{
 		super(arg_settings, (arg_log_context ? arg_log_context : context))
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_http_collector = true
+		
+		/**
+		 * Metrics reducer instance.
+		 * @type {MetricsReducer}
+		 */
+		this.metrics_reducer = undefined
+		
+		/**
+		 * Metrics state instance.
+		 * @type {MetricsState}
+		 */
+		this.metrics_state = undefined
 	}
 	
 	
@@ -79,8 +100,11 @@ export default class MetricsHttpCollector extends MetricsCollector
 	
 	
 	/**
-     * Executed before main request processing
-     * {object}   server object (Server base class instance)
+     * Executed before main request processing.
+	 * 
+     * @param {object} arg_server - server instance (Server base class instance).
+	 * 
+	 * @returns {nothing}
      */
 	static create_middleware(arg_server)
 	{

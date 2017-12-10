@@ -8,6 +8,11 @@ import T from 'devapt-core-common/dist/js/utils/types'
 import MetricsState from '../base/metrics_state'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/metrics/bus/metrics_bus_state'
 
 
@@ -29,6 +34,10 @@ export default class MetricBusState extends MetricsState
 	{
 		super('bus')
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_bus_state = true
 	}
 	

@@ -11,6 +11,11 @@ import AuthenticationManager from '../security/authentication_manager'
 import AuthorizationManager from '../security/authorization_manager'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/base/security'
 
 
@@ -24,7 +29,6 @@ export default class Security extends Errorable
 {
 	/**
 	 * Create a Security instance.
-	 * @extends Errorable
 	 * 
 	 * @param {RuntimeBase} arg_runtime - runtime.
 	 * @param {string} arg_log_context - trace logging context string.
@@ -37,9 +41,28 @@ export default class Security extends Errorable
 		const logger_manager = (arg_settings && arg_settings.logger_manager) ? arg_settings.logger_manager : undefined
 		super(arg_log_context ? arg_log_context : context, logger_manager)
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_security = true
+
+		/**
+		 * Application is read only flag.
+		 * @type {boolean}
+		 */
+		this.is_readonly = true
 		
+		/**
+		 * Authentication manager instance.
+		 * @type {AuthenticationManager}
+		 */
 		this.authentication_manager = new AuthenticationManager(arg_runtime, context + '.authentication', logger_manager)
+		
+		/**
+		 * Authorization manager instance.
+		 * @type {AuthorizationManager}
+		 */
 		this.authorization_manager = new AuthorizationManager(arg_runtime, context + '.authorization', logger_manager)
 		
 		if (arg_settings)

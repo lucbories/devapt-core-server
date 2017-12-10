@@ -9,6 +9,11 @@ import MetricsReducer from '../base/metrics_reducer'
 import MetricHttpState from './metrics_http_state'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/metrics/http/metric_hhtp_reducer'
 
 

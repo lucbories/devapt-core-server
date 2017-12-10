@@ -6,6 +6,11 @@ import MetricsBusState from './metrics_bus_state'
 import MetricsBusReducer from './metrics_bus_reducer'
 
 
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
 const context = 'server/metrics/bus/metrics_bus_collector'
 
 
@@ -30,13 +35,47 @@ export default class MetricsBusCollector extends MetricsCollector
 	{
 		super(arg_settings, (arg_log_context ? arg_log_context : context))
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_bus_collector = true
 		
+		/**
+		 * Timer instance.
+		 * @type {Timer}
+		 */
 		this.scheduler = undefined
 		
+		/**
+		 * Message bus metrics record.
+		 * @type {MetricsBusRecord}
+		 */
 		this.metrics_msg_bus = new MetricsBusRecord('msg_bus', runtime.node.get_msg_bus())
+		
+		/**
+		 * Metrics bus metrics record.
+		 * @type {MetricsBusRecord}
+		 */
 		this.metrics_metrics_bus = new MetricsBusRecord('metrics_bus', runtime.node.get_metrics_bus())
+		
+		/**
+		 * Logs bus metrics record.
+		 * @type {MetricsBusRecord}
+		 */
 		this.metrics_logs_bus = new MetricsBusRecord('logs_bus', runtime.node.get_logs_bus())
+		
+		/**
+		 * Metrics reducer instance.
+		 * @type {MetricsReducer}
+		 */
+		this.metrics_reducer = undefined
+		
+		/**
+		 * Metrics state instance.
+		 * @type {MetricsState}
+		 */
+		this.metrics_state = undefined
 	}
 	
 	

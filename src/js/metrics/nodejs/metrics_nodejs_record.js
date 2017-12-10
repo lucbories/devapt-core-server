@@ -20,7 +20,6 @@ export default class MetricsNodeJsRecord extends MetricsRecord
 {
     /**
      * Metrics node record constructor.
-	 * @extends MetricsRecord
 	 * 
 	 * @returns {nothing}
      */
@@ -28,13 +27,19 @@ export default class MetricsNodeJsRecord extends MetricsRecord
 	{
 		super('nodejs')
 		
+		/**
+		 * Class test flag.
+		 * @type {boolean}
+		 */
 		this.is_metrics_record_node  = true
 	}
 	
 	
 	
 	/**
-     * Executed before request processing
+     * Executed before request processing.
+	 * 
+	 * @returns {nothing}
      */
 	before()
 	{
@@ -64,7 +69,9 @@ export default class MetricsNodeJsRecord extends MetricsRecord
 	
 	
 	/**
-     * Executed at each request processing iteration
+     * Executed at each request processing iteration.
+	 * 
+	 * @returns {nothing}
      */
 	iteration()
 	{
@@ -73,7 +80,9 @@ export default class MetricsNodeJsRecord extends MetricsRecord
 	
 	
 	/**
-     * Executed after request processing
+     * Executed after request processing.
+	 * 
+	 * @returns {nothing}
      */
 	after()
 	{

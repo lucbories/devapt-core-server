@@ -6,7 +6,11 @@ import T          from 'devapt-core-common/dist/js/utils/types'
 import Executable from 'devapt-core-common/dist/js/base/executable'
 
 
-let context = 'server/executables/executable_command'
+/**
+ * Contextual constant for this file logs.
+ * @private
+ */
+const context = 'server/executables/executable_command'
 
 
 
@@ -17,12 +21,39 @@ let context = 'server/executables/executable_command'
  */
 export default class ExecutableCommand extends Executable
 {
+	/**
+	 * Create an Executable command.
+	 * 
+	 * @returns {nothing}
+	 */
 	constructor()
 	{
 		super(context)
+		
+		/**
+		 * Executable settings.
+		 * @protected
+		 * @type {object}
+		 */
+		this.store_config = undefined
+		
+		/**
+		 * Executable server.
+		 * @protected
+		 * @type {object}
+		 */
+		this.server = undefined
 	}
 	
 	
+
+	/**
+	 * Prepare an execution with contextual informations.
+	 * 
+	 * @param {object} arg_settings - execution settings.
+	 * 
+	 * @returns {nothing}
+	 */
 	prepare(arg_settings)
 	{
 		assert( T.isObject(arg_settings), context + ':no given config')
@@ -40,6 +71,14 @@ export default class ExecutableCommand extends Executable
 	}
 	
 	
+
+	/**
+	 * Execution with contextual informations.
+	 * 
+	 * @param {object} arg_data - execution datas.
+	 * 
+	 * @returns {object} promise
+	 */
 	execute(arg_data)
 	{
 		// CHECK APPLICATION

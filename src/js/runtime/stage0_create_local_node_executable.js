@@ -6,7 +6,11 @@ import Node from '../nodes/node'
 import RuntimeExecutable from './runtime_executable'
 
 
-let context = 'server/runtime/runtime_stage0_executable'
+/**
+ * Contextual string for logs.
+ * @type {string}
+ */
+const context = 'server/runtime/runtime_stage0_executable'
 
 
 
@@ -21,11 +25,15 @@ export default class RuntimeStage0Executable extends RuntimeExecutable
 	{
 		super(context, arg_logger_manager)
 		this.$name = 'stage 0'
+
+		// console.log(context + ':created')
 	}
 	
 	
 	execute()
 	{
+		// console.log(context + ':execute')
+
 		// SAVE TRACES STATE
 		const saved_trace = this.get_trace()
 		const has_trace = true || this.runtime.get_setting(['trace', 'stages', 'RuntimeStage0', 'enabled'], false)

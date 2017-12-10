@@ -1,9 +1,7 @@
 // NPM IMPORTS
-// import assert from 'assert'
 import { fromJS } from 'immutable'
 
 // COMMON IMPORTS
-// import T                 from 'devapt-core-common/dist/js/utils/types'
 import StreamBusEngine   from 'devapt-core-common/dist/js/messaging/stream_bus_engine'
 import SocketIOBusEngine from 'devapt-core-common/dist/js/messaging/socketio_bus_engine'
 import MessageBus        from 'devapt-core-common/dist/js/messaging/message_bus'
@@ -13,7 +11,12 @@ import NodeFeature from './node_feature'
 
 
 
-let context = 'server/nodes/bus_node_feature'
+/**
+ * Contextual constant for this file logs.
+ * @private
+ * @type {string}
+ */
+const context = 'server/nodes/bus_node_feature'
 
 
 
