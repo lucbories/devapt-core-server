@@ -1,6 +1,6 @@
 {
   "name": "devapt-core-server",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Developpers Application Toolkit - server standard features: plugins, metrics, servers, security",
   "author": {
     "name": "Luc BORIES",
@@ -39,7 +39,7 @@
     "minor": "npm version minor && unix2dos package.json",
     "major": "npm version major && unix2dos package.json",
     "merge": "git checkout master && git merge develop && git push server master",
-    "save-develop": "git commit -am && git push server develop",
+    "save-develop": "git commit -am \"save current changes\" && git push server develop",
     "save-master": "npm run merge && git checkout develop"
   },
   "browser": [
@@ -105,6 +105,7 @@
     "gulp-cached": ">=1.1.0",
     "gulp-changed": "^3.2.0",
     "gulp-concat": ">=2.6.0",
+<<<<<<< HEAD
     "gulp-livereload": "^4.0.0",
     "gulp-load-plugins": ">=1.2.0",
     "gulp-remember": "^1.0.1",
@@ -116,5 +117,17 @@
     "requirejs": "^2.3.6",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
+=======
+    "gulp-livereload": ">=3.8.1",
+    "gulp-load-plugins": ">=1.2.0",
+    "gulp-remember": ">=0.3.0",
+    "gulp-rename": ">=1.2.2",
+    "gulp-sourcemaps": ">=1.6.0",
+    "gulp-util": "^3.0.7",
+    "mocha": ">=2.4.5",
+    "requirejs": ">=2.1.20",
+    "vinyl-buffer": ">=1.0.0",
+    "vinyl-source-stream": ">=1.1.0"
+>>>>>>> a3f7bc875ffd32c7013265482587a7f4e68219fc
   }
 }
